@@ -62,7 +62,6 @@ sub req {
     else {
         $resp = $self->ua->$method( $uri->as_string, \%params );
     }
-    warn Dumper($resp);
     return WWW::JSON::Response->new( { http_response => $resp } );
 }
 
