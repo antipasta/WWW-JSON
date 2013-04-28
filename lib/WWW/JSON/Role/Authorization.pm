@@ -46,7 +46,6 @@ sub nonce {
     for (1 .. 15) {
         $nonce .= $chars[rand @chars];
     }
-    warn $nonce;
     return $nonce;
 }
 
