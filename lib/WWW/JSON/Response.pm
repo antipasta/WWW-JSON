@@ -34,3 +34,77 @@ sub res {
 }
 
 1;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+WWW::JSON::Response - Response objects returned by WWW::JSON requests
+
+=head1 SYNOPSIS
+
+    use WWW::JSON;
+    
+    my $wj = WWW::JSON->new(
+        base_url    => 'https://graph.facebook.com',
+        base_params => { access_token => 'XXXXX' }
+    );
+    my $r = $wj->get('/me', { fields => 'email' } );
+    my $email = $r->res->{email} if ($r->success);
+
+=head1 DESCRIPTION
+
+WWW::JSON::Response objects return data from WWW::JSON requests.
+
+=head1 PARAMETERS
+
+=head2 http_response
+
+An HTTP::Response object containing json
+
+=head1 METHODS
+
+=head2 success
+
+1 if both the http request returned successfully (HTTP 200 OK) AND the json was successfully decoded. 0 if either of those things went badly.
+
+=head2 response
+
+If the request returned successfully, contains the result of decoding the request's json
+
+=head2 res
+
+Alias for response
+
+=head2 code
+
+HTTP code returned by this request
+
+=head2 status_line
+
+HTTP status_line code returned by this request
+
+=head2 decoded_content
+
+The HTTP response's non json-decoded content
+
+=head2 http_response
+
+The HTTP::Response object corresponding to the request
+
+
+=head1 LICENSE
+
+Copyright (C) Joe Papperello.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Joe Papperello E<lt>antipasta@cpan.orgE<gt>
+
+=cut
+

@@ -115,39 +115,40 @@ It tries to make working with these API's as intuitive as possible.
 
 =head1 PARAMETERS
 
-base_url
+=head2 base_url
 
 The root url that all requests will be relative to.
 
-base_params
+=head2 base_params
 
 Parameters that will be added to every request made by WWW::JSON. Useful for basic api keys
 
-authorization_basic
+=head2 authorization_basic
 
 Accepts a hashref of basic HTTP auth credentials in the format { username => 'antipasta', password => 'hunter2' }
 
 Every request made by WWW::JSON will use these credentials.
 
-authorization_oauth1
+=head2 authorization_oauth1
+
 Accepts a hashref of OAuth 1.0A credentials. All requests made by WWW::JSON will use these credentias.
 
 
 =head1 METHODS
 
-get
+=head2 get
 
 $wj->get($path,$params)
 
 Performs a GET request to the relative path $path. $params is a hashref of url query parameters.
 
-post
+=head2 post
 
 $wj->post($path,$params)
 
 Performs a POST request. $params is a hashref of parameters to be passed to the post body
 
-req
+=head2 req
 
 $wj->req($method,$path,$params)
 

@@ -24,44 +24,45 @@ It tries to make working with these API's as intuitive as possible.
 
 # PARAMETERS
 
-base\_url
+## base\_url
 
 The root url that all requests will be relative to.
 
-base\_params
+## base\_params
 
 Parameters that will be added to every request made by WWW::JSON. Useful for basic api keys
 
-authorization\_basic
+## authorization\_basic
 
 Accepts a hashref of basic HTTP auth credentials in the format { username => 'antipasta', password => 'hunter2' }
 
 Every request made by WWW::JSON will use these credentials.
 
-authorization\_oauth1
+## authorization\_oauth1
+
 Accepts a hashref of OAuth 1.0A credentials. All requests made by WWW::JSON will use these credentias.
 
 
 
 # METHODS
 
-get
+## get
 
 $wj->get($path,$params)
 
-Performes a GET request to the relative path $path. $params is a hashref of url query parameters.
+Performs a GET request to the relative path $path. $params is a hashref of url query parameters.
 
-post
+## post
 
 $wj->post($path,$params)
 
-Performes a POST request. $params is a hashref of parameters to be passed to the post body
+Performs a POST request. $params is a hashref of parameters to be passed to the post body
 
-req
+## req
 
 $wj->req($method,$path,$params)
 
-Performes an HTTP request of type $method. $params is a hashref of parameters to be passed to the post body
+Performs an HTTP request of type $method. $params is a hashref of parameters to be passed to the post body
 
 # LICENSE
 
