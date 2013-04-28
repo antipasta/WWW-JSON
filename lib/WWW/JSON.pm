@@ -41,14 +41,10 @@ sub req {
     my %p = ( %{ $self->base_params // {} }, %{ $params // {} } );
     my $resp;
 
-    if ( my $auth = $self->authorization_basic ) {
-        $self->ua->default_headers->authorization_basic( $auth->{username},
-            $auth->{password} );
+    for my $auth (qw/authorization_basic authorization_oauth1/) {
+        my $handler = 'handle_' . $auth;
+        $self->$handler( $method, $uri, \%p ) if ( $self->$auth );
     }
-
-    $self->handle_authorization_oauth1( $method, $uri, \%p )
-      if ( $self->authorization_oauth1 );
-
 
     my $lwp_method = lc($method);
 
@@ -69,6 +65,13 @@ sub req {
             response_transform => $self->default_response_transform
         }
     );
+}
+
+sub handle_authorization_basic {
+    my $self = shift;
+    my $auth = $self->authorization_basic;
+    $self->ua->default_headers->authorization_basic( $auth->{username},
+        $auth->{password} );
 }
 
 sub handle_authorization_oauth1 {
