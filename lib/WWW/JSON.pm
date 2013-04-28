@@ -34,23 +34,26 @@ sub post {
 
 sub req {
     my ( $self, $method, $path, $params ) = @_;
-    my $uri = URI->new( $self->base_url . $path );
+    my $abs_uri = URI->new( $self->base_url . $path );
     my %p = ( %{ $self->base_params // {} }, %{ $params // {} } );
-    my $resp;
 
-    $self->handle_authorization($method,$uri,\%p) if ($self->can('handle_authorization'));
+    return $self->_make_request($method,$abs_uri,\%p);
+}
 
+sub _make_request {
+    my ($self,$method,$uri,$p) = @_;
     my $lwp_method = lc($method);
+    my $resp;
 
     die "Method $lwp_method not implemented"
       unless ( $self->ua->can($lwp_method) );
 
     if ( $method eq 'GET' ) {
-        $uri->query_form(%p);
+        $uri->query_form(%$p);
         $resp = $self->ua->$lwp_method( $uri->as_string );
     }
     else {
-        $resp = $self->ua->$lwp_method( $uri->as_string, \%p );
+        $resp = $self->ua->$lwp_method( $uri->as_string, $p );
     }
 
     return WWW::JSON::Response->new(
