@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 our $VERSION = "0.01";
-use JSON::XS;
 use LWP::UserAgent;
 use Moo;
 use Try::Tiny;
@@ -14,7 +13,6 @@ use Net::OAuth;
 use Data::Dumper::Concise;
 $Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
 has ua          => ( is => 'lazy' );
-has json        => ( is => 'ro', default => sub { JSON::XS->new } );
 has base_url    => ( is => 'ro' );
 has base_params => ( is => 'ro' );
 
