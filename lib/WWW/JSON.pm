@@ -49,7 +49,7 @@ sub req {
       if ( $self->authorization_oauth1 );
 
     my $lwp_method = lc($method);
-    if ( $method eq 'get' ) {
+    if ( $method eq 'GET' ) {
         $uri->query_form(%p);
         $resp = $self->ua->$lwp_method( $uri->as_string );
     }
