@@ -41,7 +41,13 @@ sub handle_authorization_oauth1 {
 }
 
 sub nonce {
-    return 'changethislater' . time();
+    my @chars = ('A'..'Z','a'..'z','0'..'9');
+    my $nonce = time;
+    for (1 .. 15) {
+        $nonce .= $chars[rand @chars];
+    }
+    warn $nonce;
+    return $nonce;
 }
 
 1;
