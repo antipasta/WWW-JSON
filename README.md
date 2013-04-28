@@ -42,6 +42,10 @@ Instead of having to do $res->{data}->\[0\]->{key1}, you can specify default\_re
 
 Then in your responses you can get at key1 directly by just doing $res->{key1}
 
+NOTE: This transform only occurs if no HTTP errors or decoding errors occurred. If we get back an HTTP error status it seems more useful to get back the entire decoded JSON blob
+
+
+
 ## authorization\_basic
 
 Accepts a hashref of basic HTTP auth credentials in the format { username => 'antipasta', password => 'hunter2' }
@@ -73,6 +77,12 @@ Performs a POST request. $params is a hashref of parameters to be passed to the 
 $wj->req($method,$path,$params)
 
 Performs an HTTP request of type $method. $params is a hashref of parameters to be passed to the post body
+
+## default\_header
+
+Set a default header for your requests
+
+
 
 # LICENSE
 
