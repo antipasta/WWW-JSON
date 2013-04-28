@@ -13,56 +13,70 @@ use WWW::JSON::Response;
 use Net::OAuth;
 use Data::Dumper::Concise;
 $Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
-has ua   => ( is => 'ro', default => sub { LWP::UserAgent->new } );
-has json => ( is => 'ro', default => sub { JSON::XS->new } );
+has ua          => ( is => 'lazy' );
+has json        => ( is => 'ro', default => sub { JSON::XS->new } );
 has base_url    => ( is => 'ro' );
 has base_params => ( is => 'ro' );
 
 has authorization_oauth1 => ( is => 'ro' );
 has authorization_basic  => ( is => 'ro' );
 
+sub _build_ua {
+    my $self = shift;
+    my $ua   = LWP::UserAgent->new;
+    if ( my $auth = $self->authorization_basic ) {
+        $ua->default_headers->authorization_basic( $auth->{username}, $auth->{password} );
+    }
+    return $ua;
+}
+
 sub get {
     my ( $self, $path, $params ) = @_;
-    $self->req( 'get', $path, $params );
+    $self->req( 'GET', $path, $params );
 }
 
 sub post {
     my ( $self, $path, $params ) = @_;
-    $self->req( 'post', $path, $params );
+    $self->req( 'POST', $path, $params );
 }
 
 sub req {
     my ( $self, $method, $path, $params ) = @_;
     my $uri = URI->new( $self->base_url . $path );
-    my %params = ( %{ $self->base_params // {} }, %{ $params // {} } );
-    my ( $resp, $json );
-    if ( $self->authorization_oauth1 ) {
-        my $request = Net::OAuth->request("protected resource")->new(
-            %{ $self->authorization_oauth1 },
-            request_url      => $uri->as_string,
-            request_method   => uc($method),
-            signature_method => 'HMAC-SHA1',
-            timestamp        => time(),
-            nonce            => nonce(),
-            extra_params     => \%params,
-        );
-        $request->sign;
-        $request->to_authorization_header;
-        $self->ua->default_header(
-            Authorization => $request->to_authorization_header );
-    }
-    if ( my $auth = $self->authorization_basic ) {
-        $self->ua->authorization_basic( $auth->{username}, $auth->{password} );
-    }
+    my %p = ( %{ ( $self->base_params, $params ) // {} } );
+    my $resp;
 
+    $self->handle_authorization_oauth1( $method, $uri, \%p )
+      if ( $self->authorization_oauth1 );
+
+    my $lwp_method = lc($method);
     if ( $method eq 'get' ) {
-        $uri->query_form(%params);
-        $resp = $self->ua->$method( $uri->as_string );
+        $uri->query_form(%p);
+        $resp = $self->ua->$lwp_method( $uri->as_string );
     }
     else {
-        $resp = $self->ua->$method( $uri->as_string, \%params );
+        $resp = $self->ua->$lwp_method( $uri->as_string, \%p );
     }
+
     return WWW::JSON::Response->new( { http_response => $resp } );
+}
+
+sub handle_authorization_oauth1 {
+    my ($self,$method, $uri,$params) = @_;
+
+    my $request = Net::OAuth->request("protected resource")->new(
+        %{ $self->authorization_oauth1 },
+        request_url      => $uri->as_string,
+        request_method   => $method,
+        signature_method => 'HMAC-SHA1',
+        timestamp        => time(),
+        nonce            => nonce(),
+        extra_params     => $params,
+    );
+    $request->sign;
+    $request->to_authorization_header;
+    $self->ua->default_header(
+        Authorization => $request->to_authorization_header );
 }
 
 sub nonce {
