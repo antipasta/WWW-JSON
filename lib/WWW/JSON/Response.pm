@@ -23,9 +23,11 @@ sub _build_response {
     return try {
         my $decoded =
           $self->json->decode( $self->http_response->decoded_content );
-        $decoded = $self->response_transform->($decoded)
-          if ( defined( $self->response_transform ) );
-        $self->_set_success(1) if ( $self->http_response->is_success );
+        if ( $self->http_response->is_success ) {
+            $decoded = $self->response_transform->($decoded)
+              if ( defined( $self->response_transform ) );
+            $self->_set_success(1);
+        }
         return $decoded;
     }
     catch {
