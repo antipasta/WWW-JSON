@@ -18,7 +18,7 @@ has ua => (
 has base_url => ( is => 'rw' );
 has base_params => ( is => 'rw', default => sub { +{} } );
 
-has default_response_transform => ( is => 'rw' );
+has default_response_transform => ( is => 'rw', clearer => 1 );
 with 'WWW::JSON::Role::Authorization';
 
 sub get {
