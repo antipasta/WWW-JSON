@@ -15,20 +15,20 @@ has ua => (
     handles => [qw/default_header default_headers/],
     default => sub { LWP::UserAgent->new }
 );
-has base_url    => ( is => 'rw' );
-has base_params => ( is => 'rw', default => sub {} );
+has base_url => ( is => 'rw' );
+has base_params => ( is => 'rw', default => sub { +{} } );
 
 has default_response_transform => ( is => 'rw' );
 with 'WWW::JSON::Role::Authorization';
 
 sub get {
-    my ( $self, $path, $params ) = @_;
-    $self->req( 'GET', $path, $params );
+    my $self = shift;
+    $self->req( 'GET', @_ );
 }
 
 sub post {
-    my ( $self, $path, $params ) = @_;
-    $self->req( 'POST', $path, $params );
+    my $self = shift;
+    $self->req( 'POST', @_ );
 }
 
 sub req {
@@ -36,16 +36,16 @@ sub req {
     my $abs_uri = URI->new( $self->base_url . $path );
     my %p = ( %{ $self->base_params }, %{ $params // {} } );
 
-    return $self->_make_request($method,$abs_uri,\%p);
+    return $self->_make_request( $method, $abs_uri, \%p );
 }
 
 sub base_param {
-    my ($self,$k,$v) = @_;
+    my ( $self, $k, $v ) = @_;
     $self->base_params->{$k} = $v;
 }
 
 sub _make_request {
-    my ($self,$method,$uri,$p) = @_;
+    my ( $self, $method, $uri, $p ) = @_;
     my $lwp_method = lc($method);
     my $resp;
 

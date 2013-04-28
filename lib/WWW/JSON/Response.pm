@@ -36,9 +36,7 @@ sub _build_response {
     };
 }
 
-sub res {
-    return shift->response;
-}
+sub res { shift->response }
 
 1;
 
@@ -51,7 +49,6 @@ __END__
 WWW::JSON::Response - Response objects returned by WWW::JSON requests
 
 =head1 SYNOPSIS
-
     use WWW::JSON;
     
     my $wj = WWW::JSON->new(
