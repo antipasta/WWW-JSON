@@ -16,11 +16,10 @@ has ua => (
     default => sub { LWP::UserAgent->new }
 );
 has base_url    => ( is => 'rw' );
-has base_params => ( is => 'rw' );
+has base_params => ( is => 'rw', default => sub {} );
 
 has default_response_transform => ( is => 'rw' );
 with 'WWW::JSON::Role::Authorization';
-
 
 sub get {
     my ( $self, $path, $params ) = @_;
@@ -35,9 +34,14 @@ sub post {
 sub req {
     my ( $self, $method, $path, $params ) = @_;
     my $abs_uri = URI->new( $self->base_url . $path );
-    my %p = ( %{ $self->base_params // {} }, %{ $params // {} } );
+    my %p = ( %{ $self->base_params }, %{ $params // {} } );
 
     return $self->_make_request($method,$abs_uri,\%p);
+}
+
+sub base_param {
+    my ($self,$k,$v) = @_;
+    $self->base_params->{$k} = $v;
 }
 
 sub _make_request {
@@ -148,6 +152,10 @@ Performs an HTTP request of type $method. $params is a hashref of parameters to 
 =head2 default_header
 
 Set a default header for your requests
+
+=head2 base_param
+
+Add/Update a single base param
 
 
 =head1 LICENSE
