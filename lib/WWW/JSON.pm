@@ -25,7 +25,8 @@ sub _build_ua {
     my $self = shift;
     my $ua   = LWP::UserAgent->new;
     if ( my $auth = $self->authorization_basic ) {
-        $ua->default_headers->authorization_basic( $auth->{username}, $auth->{password} );
+        $ua->default_headers->authorization_basic( $auth->{username},
+            $auth->{password} );
     }
     return $ua;
 }
@@ -43,7 +44,7 @@ sub post {
 sub req {
     my ( $self, $method, $path, $params ) = @_;
     my $uri = URI->new( $self->base_url . $path );
-    my %p = ( %{ ( $self->base_params, $params ) // {} } );
+    my %p = %{ ( $self->base_params, $params ) // {} };
     my $resp;
 
     $self->handle_authorization_oauth1( $method, $uri, \%p )
@@ -62,7 +63,7 @@ sub req {
 }
 
 sub handle_authorization_oauth1 {
-    my ($self,$method, $uri,$params) = @_;
+    my ( $self, $method, $uri, $params ) = @_;
 
     my $request = Net::OAuth->request("protected resource")->new(
         %{ $self->authorization_oauth1 },
