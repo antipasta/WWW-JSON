@@ -42,13 +42,17 @@ sub post {
 sub req {
     my ( $self, $method, $path, $params ) = @_;
     my $uri = URI->new( $self->base_url . $path );
-    my %p = %{ ( $self->base_params, $params ) // {} };
+    my %p = (%{ $self->base_params // {} }, %{ $params // {} });
     my $resp;
 
     $self->handle_authorization_oauth1( $method, $uri, \%p )
       if ( $self->authorization_oauth1 );
 
     my $lwp_method = lc($method);
+
+    die "Method $lwp_method not implemented"
+      unless ( $self->ua->can($lwp_method) );
+
     if ( $method eq 'GET' ) {
         $uri->query_form(%p);
         $resp = $self->ua->$lwp_method( $uri->as_string );
