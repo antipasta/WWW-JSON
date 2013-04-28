@@ -111,6 +111,9 @@ Instead of having to do $res->{data}->[0]->{key1}, you can specify default_respo
 
 Then in your responses you can get at key1 directly by just doing $res->{key1}
 
+NOTE: This transform only occurs if no HTTP errors or decoding errors occurred. If we get back an HTTP error status it seems more useful to get back the entire decoded JSON blob
+
+
 =head2 authorization_basic
 
 Accepts a hashref of basic HTTP auth credentials in the format { username => 'antipasta', password => 'hunter2' }

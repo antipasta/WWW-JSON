@@ -79,7 +79,7 @@ An HTTP::Response object containing json
 
 =head2 response
 
-If the request returned successfully, contains the result of decoding the request's json
+The results of decoding the json response. Will be decoded even in the event of an error, since hopefully the API is nice enough to return some json describing the error that occurred.
 
 =head2 res
 
