@@ -9,9 +9,7 @@ use Moo;
 use Try::Tiny;
 use URI;
 use WWW::JSON::Response;
-use Net::OAuth;
 use Data::Dumper::Concise;
-$Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
 has ua => (
     is      => 'lazy',
     handles => [qw/default_header default_headers/],
@@ -62,8 +60,6 @@ sub req {
         }
     );
 }
-
-
 
 1;
 __END__

@@ -1,5 +1,7 @@
 package WWW::JSON::Role::Authorization;
 use Moo::Role;
+use Net::OAuth;
+$Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
 
 has authorization_basic  => ( is => 'rw' );
 has authorization_oauth1 => ( is => 'rw' );
