@@ -9,27 +9,23 @@ has http_response => (
     required => 1,
     handles  => [qw/status_line decoded_content code/],
 );
-has json => ( is => 'ro', default => sub { JSON::XS->new } );
-has response => ( is => 'ro', builder => '_build_response' );
+has json => ( is => 'lazy', default => sub { JSON::XS->new } );
 has success => ( is => 'lazy', default => sub { 0 }, writer => '_set_success' );
 has response_transform => ( is => 'ro' );
+has response => ( is => 'lazy', builder => '_build_response' );
 
-around response => sub {
-    my ( $orig, $self ) = ( shift, shift );
-    my $resp = $self->$orig(@_);
-    return ( defined($resp) && defined( $self->response_transform ) )
-      ? $self->response_transform->($resp)
-      : $resp;
-};
+## success requires that response has been built
+before 'success' => sub { my $self = shift; $self->response; };
 
 sub _build_response {
     my $self = shift;
-    return unless ( $self->http_response->is_success );
 
     return try {
         my $decoded =
           $self->json->decode( $self->http_response->decoded_content );
-        $self->_set_success(1);
+        $decoded = $self->response_transform->($decoded)
+          if ( defined( $self->response_transform ) );
+        $self->_set_success(1) if ( $self->http_response->is_success );
         return $decoded;
     }
     catch {

@@ -13,12 +13,12 @@ use Net::OAuth;
 use Data::Dumper::Concise;
 $Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
 has ua          => ( is => 'lazy' );
-has base_url    => ( is => 'ro' );
-has base_params => ( is => 'ro' );
+has base_url    => ( is => 'rw' );
+has base_params => ( is => 'rw' );
 
-has authorization_oauth1       => ( is => 'ro' );
 has authorization_basic        => ( is => 'ro' );
-has default_response_transform => ( is => 'ro' );
+has default_response_transform => ( is => 'rw' );
+has authorization_oauth1       => ( is => 'rw' );
 
 sub _build_ua {
     my $self = shift;
