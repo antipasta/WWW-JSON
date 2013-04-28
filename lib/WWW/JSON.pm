@@ -21,15 +21,8 @@ has base_params => ( is => 'rw', default => sub { +{} } );
 has default_response_transform => ( is => 'rw', clearer => 1 );
 with 'WWW::JSON::Role::Authorization';
 
-sub get {
-    my $self = shift;
-    $self->req( 'GET', @_ );
-}
-
-sub post {
-    my $self = shift;
-    $self->req( 'POST', @_ );
-}
+sub get { shift->req( 'GET', @_ ) }
+sub post { shift->req( 'POST', @_ ) }
 
 sub req {
     my ( $self, $method, $path, $params ) = @_;
