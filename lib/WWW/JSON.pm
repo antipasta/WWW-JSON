@@ -16,8 +16,9 @@ has ua          => ( is => 'lazy' );
 has base_url    => ( is => 'ro' );
 has base_params => ( is => 'ro' );
 
-has authorization_oauth1 => ( is => 'ro' );
-has authorization_basic  => ( is => 'ro' );
+has authorization_oauth1       => ( is => 'ro' );
+has authorization_basic        => ( is => 'ro' );
+has default_response_transform => ( is => 'ro' );
 
 sub _build_ua {
     my $self = shift;
@@ -42,7 +43,7 @@ sub post {
 sub req {
     my ( $self, $method, $path, $params ) = @_;
     my $uri = URI->new( $self->base_url . $path );
-    my %p = (%{ $self->base_params // {} }, %{ $params // {} });
+    my %p = ( %{ $self->base_params // {} }, %{ $params // {} } );
     my $resp;
 
     $self->handle_authorization_oauth1( $method, $uri, \%p )
@@ -61,7 +62,12 @@ sub req {
         $resp = $self->ua->$lwp_method( $uri->as_string, \%p );
     }
 
-    return WWW::JSON::Response->new( { http_response => $resp } );
+    return WWW::JSON::Response->new(
+        {
+            http_response      => $resp,
+            response_transform => $self->default_response_transform
+        }
+    );
 }
 
 sub handle_authorization_oauth1 {
@@ -122,6 +128,16 @@ The root url that all requests will be relative to.
 =head2 base_params
 
 Parameters that will be added to every request made by WWW::JSON. Useful for basic api keys
+
+=head2 default_response_transform
+
+Many API's have a lot of boilerplate around their json responses.
+
+For example lets say every request's meaningful payload is included inside the first array index of a hash key called 'data'.
+
+Instead of having to do $res->{data}->[0]->{key1}, you can specify default_response_transform as sub { shift->{data}->[0] } 
+
+Then in your responses you can get at key1 directly by just doing $res->{key1}
 
 =head2 authorization_basic
 

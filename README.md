@@ -32,6 +32,16 @@ The root url that all requests will be relative to.
 
 Parameters that will be added to every request made by WWW::JSON. Useful for basic api keys
 
+## default\_response\_transform
+
+Many API's have a lot of boilerplate around their json responses.
+
+For example lets say every request's meaningful payload is included inside the first array index of a hash key called 'data'.
+
+Instead of having to do $res->{data}->\[0\]->{key1}, you can specify default\_response\_transform as sub { shift->{data}->\[0\] } 
+
+Then in your responses you can get at key1 directly by just doing $res->{key1}
+
 ## authorization\_basic
 
 Accepts a hashref of basic HTTP auth credentials in the format { username => 'antipasta', password => 'hunter2' }

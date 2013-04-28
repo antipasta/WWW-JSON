@@ -12,6 +12,16 @@ has http_response => (
 has json => ( is => 'ro', default => sub { JSON::XS->new } );
 has response => ( is => 'ro', builder => '_build_response' );
 has success => ( is => 'lazy', default => sub { 0 }, writer => '_set_success' );
+has response_transform => ( is => 'ro' );
+
+around response => sub {
+    my ( $orig, $self ) = ( shift, shift );
+    my $resp = $self->$orig(@_);
+    return
+      defined( $self->response_transform )
+      ? $self->response_transform->($resp)
+      : $resp;
+};
 
 sub _build_response {
     my $self = shift;
