@@ -7,12 +7,12 @@ has authorization_basic  => ( is => 'rw' );
 has authorization_oauth1 => ( is => 'rw' );
 
 around _make_request => sub {
-    my ($orig,$self,$method,$uri,$p) = @_;
+    my ( $orig, $self, $method, $uri, $p ) = @_;
     for my $auth (qw/authorization_basic authorization_oauth1/) {
         my $handler = 'handle_' . $auth;
         $self->$handler( $method, $uri, $p ) if ( $self->$auth );
     }
-    $self->$orig($method,$uri,$p);
+    $self->$orig( $method, $uri, $p );
 };
 
 sub handle_authorization_basic {

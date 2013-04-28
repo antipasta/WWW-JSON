@@ -15,7 +15,7 @@ has response_transform => ( is => 'ro' );
 has response => ( is => 'lazy', builder => '_build_response' );
 
 ## success requires that response has been built
-before 'success' => sub { my $self = shift; $self->response; };
+before 'success' => sub { shift->response; };
 
 sub _build_response {
     my $self = shift;
