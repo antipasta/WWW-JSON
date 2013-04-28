@@ -6,6 +6,7 @@ WWW::JSON - Make working with JSON Web API's as painless as possible
 
     use WWW::JSON;
     
+
     my $wj = WWW::JSON->new(
         base_url    => 'https://graph.facebook.com',
         base_params => { access_token => 'XXXXX' }
@@ -20,24 +21,26 @@ WWW::JSON is an easy interface to any modern web API that returns JSON.
 It tries to make working with these API's as intuitive as possible.
 
 
+
 # PARAMETERS
 
-base_url
+base\_url
 
 The root url that all requests will be relative to.
 
-base_params
+base\_params
 
 Parameters that will be added to every request made by WWW::JSON. Useful for basic api keys
 
-authorization_basic
+authorization\_basic
 
 Accepts a hashref of basic HTTP auth credentials in the format { username => 'antipasta', password => 'hunter2' }
 
 Every request made by WWW::JSON will use these credentials.
 
-authorization_oauth1
+authorization\_oauth1
 Accepts a hashref of OAuth 1.0A credentials. All requests made by WWW::JSON will use these credentias.
+
 
 
 # METHODS

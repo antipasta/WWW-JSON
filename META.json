@@ -1,5 +1,5 @@
 {
-   "abstract" : "It's new $module",
+   "abstract" : "Make working with JSON Web API's as painless as possible",
    "author" : [
       "Joe Papperello <antipasta@cpan.org>"
    ],
@@ -42,6 +42,13 @@
       },
       "runtime" : {
          "requires" : {
+            "Data::Dumper::Concise" : "1.60",
+            "JSON::XS" : "2.33",
+            "LWP::UserAgent" : "0",
+            "Moo" : "1.001",
+            "Net::OAuth" : "0.28",
+            "Try::Tiny" : "0.12",
+            "URI" : "0",
             "perl" : "5.008005"
          }
       },
@@ -52,5 +59,19 @@
       }
    },
    "release_status" : "unstable",
-   "version" : "0.01"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/antipasta/WWW-JSON/issues"
+      },
+      "homepage" : "https://github.com/antipasta/WWW-JSON",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/antipasta/WWW-JSON.git",
+         "web" : "https://github.com/antipasta/WWW-JSON"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Joe Papperello <joe@socialflow.com>"
+   ]
 }
