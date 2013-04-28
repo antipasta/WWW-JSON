@@ -139,19 +139,19 @@ get
 
 $wj->get($path,$params)
 
-Performes a GET request to the relative path $path. $params is a hashref of url query parameters.
+Performs a GET request to the relative path $path. $params is a hashref of url query parameters.
 
 post
 
 $wj->post($path,$params)
 
-Performes a POST request. $params is a hashref of parameters to be passed to the post body
+Performs a POST request. $params is a hashref of parameters to be passed to the post body
 
 req
 
 $wj->req($method,$path,$params)
 
-Performes an HTTP request of type $method. $params is a hashref of parameters to be passed to the post body
+Performs an HTTP request of type $method. $params is a hashref of parameters to be passed to the post body
 
 =head1 LICENSE
 
