@@ -17,8 +17,7 @@ has response_transform => ( is => 'ro' );
 around response => sub {
     my ( $orig, $self ) = ( shift, shift );
     my $resp = $self->$orig(@_);
-    return
-      defined( $self->response_transform )
+    return ( defined($resp) && defined( $self->response_transform ) )
       ? $self->response_transform->($resp)
       : $resp;
 };
