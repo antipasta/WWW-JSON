@@ -12,23 +12,18 @@ use WWW::JSON::Response;
 use Net::OAuth;
 use Data::Dumper::Concise;
 $Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
-has ua          => ( is => 'lazy' );
+has ua => (
+    is      => 'lazy',
+    handles => [qw/default_header default_headers/],
+    default => sub { LWP::UserAgent->new }
+);
 has base_url    => ( is => 'rw' );
 has base_params => ( is => 'rw' );
 
-has authorization_basic        => ( is => 'ro' );
+has authorization_basic        => ( is => 'rw' );
 has default_response_transform => ( is => 'rw' );
 has authorization_oauth1       => ( is => 'rw' );
 
-sub _build_ua {
-    my $self = shift;
-    my $ua   = LWP::UserAgent->new;
-    if ( my $auth = $self->authorization_basic ) {
-        $ua->default_headers->authorization_basic( $auth->{username},
-            $auth->{password} );
-    }
-    return $ua;
-}
 
 sub get {
     my ( $self, $path, $params ) = @_;
@@ -46,8 +41,14 @@ sub req {
     my %p = ( %{ $self->base_params // {} }, %{ $params // {} } );
     my $resp;
 
+    if ( my $auth = $self->authorization_basic ) {
+        $self->ua->default_headers->authorization_basic( $auth->{username},
+            $auth->{password} );
+    }
+
     $self->handle_authorization_oauth1( $method, $uri, \%p )
       if ( $self->authorization_oauth1 );
+
 
     my $lwp_method = lc($method);
 
@@ -169,6 +170,11 @@ Performs a POST request. $params is a hashref of parameters to be passed to the 
 $wj->req($method,$path,$params)
 
 Performs an HTTP request of type $method. $params is a hashref of parameters to be passed to the post body
+
+=head2 default_header
+
+Set a default header for your requests
+
 
 =head1 LICENSE
 
