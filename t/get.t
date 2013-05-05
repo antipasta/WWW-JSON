@@ -44,6 +44,8 @@ $fake_ua->map(
         my $req = shift;
         my $uri = $req->uri;
         is $req->method => 'POST', 'Method is POST';
+        is $req->content => 'some_post_param=yes',
+          'Successfully sent POST param';
         isnt $uri->query_param('some_query_param'), 'yes',
           'POST doesnt include param in uri';
 
@@ -63,7 +65,6 @@ $fake_ua->map(
     }
 );
 
-
 $fake_ua->map(
     'http://localhost/failed_json_parse',
     sub {
@@ -72,6 +73,16 @@ $fake_ua->map(
     }
 );
 
+$fake_ua->map(
+    'http://localhost/test/transform',
+    sub {
+        my $req = shift;
+        my $uri = $req->uri;
+        is $req->method => 'POST', 'Method is POST';
+        return HTTP::Response->new( 200, 'OK', undef,
+            $json->encode( { data => { result => [ 'item 1', 'item 2' ] } } ) );
+    }
+);
 ok my $wj = WWW::JSON->new( ua => $fake_ua, base_url => 'http://localhost' );
 ok my $get = $wj->get('/get/request');
 ok $get->success, 'Got Success';
@@ -82,13 +93,13 @@ ok my $get_404 = $wj->get('/404');
 is $get_404->success => 0,   'Got no success';
 is $get_404->code    => 404, 'Got code 404';
 
-ok my $get_query_param = $wj->get( '/get/request', { some_query_param => 'yes' } );
+ok my $get_query_param =
+  $wj->get( '/get/request', { some_query_param => 'yes' } );
 ok $get_query_param->success, 'Got Success';
 is $get_query_param->code => 200, 'Got 200';
 ok $get_query_param->res->{success} eq 'this is also working';
 
-ok my $post = $wj->post( '/post/request',
-    { some_post_param => 'yes', other_post_param => 'no' } );
+ok my $post = $wj->post( '/post/request', { some_post_param => 'yes' } );
 ok $post->success;
 is $post->code => 200;
 ok $post->res->{success} eq 'POST is working';
@@ -100,8 +111,21 @@ is $fail->success => 0,   'JSON parse failed';
 ok !defined( $fail->res ), 'No decoded json response';
 is $fail->decoded_content => 'THIS IS NOT JSON';
 
-ok my $req_non_base = $wj->post('http://some_alt_url/something', { param => 456 });
-ok $req_non_base->success,'json success';
-is $req_non_base->res->{msg} => 'non base response', 'got back response from non base url';
+ok my $req_non_base =
+  $wj->post( 'http://some_alt_url/something', { param => 456 } );
+ok $req_non_base->success, 'json success';
+is $req_non_base->res->{msg} => 'non base response',
+  'got back response from non base url';
+
+ok my $transform =
+  $wj->default_response_transform( sub { shift->{data}{result} } );
+ok my $req_transform = $wj->post('/test/transform');
+is_deeply $req_transform->res, [ 'item 1', 'item 2' ],
+  'response_transform works';
+
+ok $wj->clear_default_response_transform;
+ok my $clear_transform = $wj->post('/test/transform');
+is_deeply $clear_transform->res->{data}->{result}, [ 'item 1', 'item 2' ],
+  'clear_response_transform works';
 
 done_testing;
