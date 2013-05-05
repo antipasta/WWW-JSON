@@ -10,6 +10,7 @@ use Try::Tiny;
 use URI;
 use WWW::JSON::Response;
 use Data::Dumper::Concise;
+use Safe::Isa;
 has ua => (
     is      => 'lazy',
     handles => [qw/default_header default_headers/],
@@ -26,10 +27,13 @@ sub post { shift->req( 'POST', @_ ) }
 
 sub req {
     my ( $self, $method, $path, $params ) = @_;
-    my $abs_uri = URI->new( $self->base_url . $path );
-    my %p = ( %{ $self->base_params }, %{ $params // {} } );
+    $path = URI->new($path) unless $path->$_isa('URI');
 
-    return $self->_make_request( $method, $abs_uri, \%p );
+    my $abs_uri =
+      ( $path->scheme ) ? $path : URI->new( $self->base_url . $path );
+    my $p = { %{ $self->base_params }, %{ $params // {} } };
+
+    return $self->_make_request( $method, $abs_uri, $p );
 }
 
 sub base_param {

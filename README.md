@@ -82,6 +82,10 @@ Performs an HTTP request of type $method. $params is a hashref of parameters to 
 
 Set a default header for your requests
 
+## base\_param
+
+Add/Update a single base param
+
 
 
 # LICENSE
