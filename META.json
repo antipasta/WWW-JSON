@@ -4,7 +4,7 @@
       "Joe Papperello <antipasta@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v0.1.0, CPAN::Meta::Converter version 2.130880",
+   "generated_by" : "Minilla/v0.3.2, CPAN::Meta::Converter version 2.130880",
    "license" : [
       "perl_5"
    ],
@@ -47,6 +47,7 @@
             "LWP::UserAgent" : "0",
             "Moo" : "1.001",
             "Net::OAuth" : "0.28",
+            "Safe::Isa" : "1.000003",
             "Try::Tiny" : "0.12",
             "URI" : "0",
             "perl" : "5.008005"
