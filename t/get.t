@@ -55,6 +55,21 @@ $fake_ua->map(
 );
 
 $fake_ua->map(
+    'http://localhost/json_post_request',
+    sub {
+        my $req = shift;
+        my $uri = $req->uri;
+        is $req->method => 'POST', 'Method is POST';
+        is $req->header('Content-Type'), 'application/json', 'json content type';
+        ok $req->content, 'got json post body';
+        my $decoded = $json->decode($req->content);
+        is $decoded->{json_param}, '555', 'decoded json value received';
+
+        return HTTP::Response->new( 200, 'OK', undef,
+            $json->encode( { success => 'JSON POST is working' } ) );
+    }
+);
+$fake_ua->map(
     'http://some_alt_url/something',
     sub {
         my $req = shift;
@@ -100,8 +115,8 @@ is $get_query_param->code => 200, 'Got 200';
 ok $get_query_param->res->{success} eq 'this is also working';
 
 ok my $post = $wj->post( '/post/request', { some_post_param => 'yes' } );
-ok $post->success;
-is $post->code => 200;
+ok $post->success, 'post successful';
+is $post->code => 200, 'post 200 OK';
 ok $post->res->{success} eq 'POST is working';
 
 ok my $fail = $wj->post('/failed_json_parse');
@@ -125,6 +140,14 @@ is_deeply $req_transform->res, [ 'item 1', 'item 2' ],
 
 ok $wj->clear_default_response_transform;
 ok my $clear_transform = $wj->post('/test/transform');
+is_deeply $clear_transform->res->{data}->{result}, [ 'item 1', 'item 2' ],
+  'clear_response_transform works';
+$wj->clear_default_response_transform;
+
+ok $wj->post_body_format('JSON');
+ok my $json_post_body = $wj->post('/json_post_request', {json_param => 555 });
+is $json_post_body->res->{success}, 'JSON POST is working';
+
 is_deeply $clear_transform->res->{data}->{result}, [ 'item 1', 'item 2' ],
   'clear_response_transform works';
 

@@ -11,6 +11,9 @@ use URI;
 use WWW::JSON::Response;
 use Data::Dumper::Concise;
 use Safe::Isa;
+use HTTP::Request::Common ();
+use JSON::XS;
+
 has ua => (
     is      => 'lazy',
     handles => [qw/default_header default_headers/],
@@ -18,11 +21,14 @@ has ua => (
 );
 has base_url => ( is => 'rw' );
 has base_params => ( is => 'rw', default => sub { +{} } );
+has post_body_format =>
+  ( is => 'rw', default => sub { 'serialized' }, clearer => 1 );
+has json => ( is => 'ro', default => sub { JSON::XS->new } );
 
 has default_response_transform => ( is => 'rw', clearer => 1 );
 with 'WWW::JSON::Role::Authorization';
 
-sub get { shift->req( 'GET', @_ ) }
+sub get  { shift->req( 'GET',  @_ ) }
 sub post { shift->req( 'POST', @_ ) }
 
 sub req {
@@ -43,19 +49,31 @@ sub base_param {
 
 sub _make_request {
     my ( $self, $method, $uri, $p ) = @_;
-    my $lwp_method = lc($method);
-    my $resp;
 
-    die "Method $lwp_method not implemented"
-      unless ( $self->ua->can($lwp_method) );
+    my %dispatch = (
+        GET    => \&HTTP::Request::Common::GET,
+        POST   => \&HTTP::Request::Common::POST,
+        PUT    => \&HTTP::Request::Common::PUT,
+        DELETE => \&HTTP::Request::Common::DELETE
+    );
+    my $dispatch_method = $dispatch{$method}
+      or die "Method $method not implemented";
+    my %payload;
 
-    if ( $method eq 'GET' ) {
-        $uri->query_form(%$p);
-        $resp = $self->ua->$lwp_method( $uri->as_string );
+    if ($p) {
+        if ( $method eq 'GET' ) {
+            $uri->query_form(%$p);
+        }
+        elsif ( $self->post_body_format eq 'JSON' ) {
+            %payload = (
+                'Content-Type' => 'application/json',
+                Content        => $self->json->encode($p)
+            );
+        }
+        else { %payload = ( Content => $p ) }
     }
-    else {
-        $resp = $self->ua->$lwp_method( $uri->as_string, $p );
-    }
+    my $resp =
+      $self->ua->request( $dispatch_method->( $uri->as_string, %payload ) );
 
     return WWW::JSON::Response->new(
         {
