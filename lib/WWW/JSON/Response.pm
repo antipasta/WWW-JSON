@@ -10,16 +10,19 @@ has http_response => (
     handles  => [qw/status_line decoded_content code/],
 );
 has json => ( is => 'lazy', default => sub { JSON::XS->new } );
-has success => ( is => 'lazy', default => sub { 0 }, writer => '_set_success' );
+has success => ( is => 'lazy', writer => '_set_success' );
 has response_transform => ( is => 'ro' );
 has response => ( is => 'lazy', builder => '_build_response' );
 
-## success requires that response has been built
-before 'success' => sub { shift->response; };
+sub _build_success {
+    my $self = shift;
+    $self->_set_success(0);
+    $self->response;
+    return $self->success;
+}
 
 sub _build_response {
     my $self = shift;
-
     return try {
         my $decoded =
           $self->json->decode( $self->http_response->decoded_content );
