@@ -6,8 +6,6 @@ use HTTP::Response;
 use WWW::JSON;
 use JSON::XS;
 use Data::Dumper::Concise;
-use URI;
-use URI::QueryParam;
 
 my $json    = JSON::XS->new;
 my $fake_ua = LWP::UserAgent->new;

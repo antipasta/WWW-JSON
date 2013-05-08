@@ -3,7 +3,6 @@ use warnings;
 use Test::More;
 use Test::Mock::LWP::Dispatch;
 use HTTP::Response;
-use HTTP::Headers;
 use WWW::JSON;
 use JSON::XS;
 use Data::Dumper::Concise;
