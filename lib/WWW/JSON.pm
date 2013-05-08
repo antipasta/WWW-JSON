@@ -50,14 +50,8 @@ sub base_param {
 sub _make_request {
     my ( $self, $method, $uri, $p ) = @_;
 
-    my %dispatch = (
-        GET    => \&HTTP::Request::Common::GET,
-        POST   => \&HTTP::Request::Common::POST,
-        PUT    => \&HTTP::Request::Common::PUT,
-        DELETE => \&HTTP::Request::Common::DELETE
-    );
-    my $dispatch_method = $dispatch{$method}
-      or die "Method $method not implemented";
+    my $lwp_method = lc($method);
+    die "Method $method not implemented" unless ( $self->ua->can($lwp_method) );
     my %payload;
 
     if ($p) {
@@ -72,8 +66,7 @@ sub _make_request {
         }
         else { %payload = ( Content => $p ) }
     }
-    my $resp =
-      $self->ua->request( $dispatch_method->( $uri->as_string, %payload ) );
+    my $resp = $self->ua->$lwp_method( $uri->as_string, %payload );
 
     return WWW::JSON::Response->new(
         {
