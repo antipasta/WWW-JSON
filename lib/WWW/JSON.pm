@@ -16,7 +16,7 @@ use JSON::XS;
 
 has ua => (
     is      => 'lazy',
-    handles => [qw/default_header default_headers/],
+    handles => [qw/default_header default_headers timeout/],
     default => sub { LWP::UserAgent->new }
 );
 has base_url => ( is => 'rw' );
