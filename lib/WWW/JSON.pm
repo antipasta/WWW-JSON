@@ -23,7 +23,7 @@ has base_url => (
     is     => 'rw',
     coerce => sub {
         my $base_url = shift;
-        return $base_url if ($base_url->$_isa('URI'));
+        return $base_url if ( $base_url->$_isa('URI') );
         if ( ref($base_url) eq 'ARRAY' ) {
             my ( $url, $params ) = @{$base_url};
             my $u = URI->new($url);
@@ -46,8 +46,10 @@ sub post { shift->req( 'POST', @_ ) }
 
 sub req {
     my ( $self, $method, $path, $params ) = @_;
-    $path =~ s|^/|./|;
-    $path = URI->new($path) unless $path->$_isa('URI');
+    unless ( $path->$_isa('URI') ) {
+        $path =~ s|^/|./|;
+        $path = URI->new($path);
+    }
 
     my $abs_uri =
       ( $path->scheme ) ? $path : URI->new_abs( $path, $self->base_url );
@@ -71,7 +73,7 @@ sub _make_request {
 
     if ($p) {
         if ( $method eq 'GET' ) {
-            $uri->query_form($uri->query_form, %$p);
+            $uri->query_form( $uri->query_form, %$p );
         }
         elsif ( $self->post_body_format eq 'JSON' ) {
             %payload = (
