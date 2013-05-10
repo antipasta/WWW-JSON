@@ -25,7 +25,7 @@ $fake_ua->map(
 );
 
 $fake_ua->map(
-    'http://localhost/get/request?some_query_param=yes',
+    'http://localhost/get/request_query_param?some_query_param=yes',
     sub {
         my $req = shift;
         my $uri = $req->uri;
@@ -48,10 +48,10 @@ is $get_404->success => 0,   'Got no success';
 is $get_404->code    => 404, 'Got code 404';
 
 ok my $get_query_param =
-  $wj->get( '/get/request', { some_query_param => 'yes' } );
+  $wj->get( '/get/request_query_param', { some_query_param => 'yes' } );
 ok $get_query_param->success, 'Got Success';
 is $get_query_param->code => 200, 'Got 200';
-ok $get_query_param->res->{success} eq 'this is also working';
+ok $get_query_param->res->{success} eq 'this is also working', 'Got get response';
 
 
 done_testing;
