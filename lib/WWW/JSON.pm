@@ -19,7 +19,20 @@ has ua => (
     handles => [qw/default_header default_headers timeout/],
     default => sub { LWP::UserAgent->new }
 );
-has base_url => ( is => 'rw' );
+has base_url => (
+    is     => 'rw',
+    coerce => sub {
+        my $base_url = shift;
+        return $base_url if ($base_url->$_isa('URI'));
+        if ( ref($base_url) eq 'ARRAY' ) {
+            my ( $url, $params ) = @{$base_url};
+            my $u = URI->new($url);
+            $u->query_form(%$params);
+            return $u;
+        }
+        return URI->new($base_url);
+    }
+);
 has base_params => ( is => 'rw', default => sub { +{} } );
 has post_body_format =>
   ( is => 'rw', default => sub { 'serialized' }, clearer => 1 );
@@ -33,10 +46,12 @@ sub post { shift->req( 'POST', @_ ) }
 
 sub req {
     my ( $self, $method, $path, $params ) = @_;
+    $path =~ s|^/|./|;
     $path = URI->new($path) unless $path->$_isa('URI');
 
     my $abs_uri =
-      ( $path->scheme ) ? $path : URI->new( $self->base_url . $path );
+      ( $path->scheme ) ? $path : URI->new_abs( $path, $self->base_url );
+    $abs_uri->query_form( $path->query_form, $self->base_url->query_form );
     my $p = { %{ $self->base_params }, %{ $params // {} } };
 
     return $self->_make_request( $method, $abs_uri, $p );
@@ -56,7 +71,7 @@ sub _make_request {
 
     if ($p) {
         if ( $method eq 'GET' ) {
-            $uri->query_form(%$p);
+            $uri->query_form($uri->query_form, %$p);
         }
         elsif ( $self->post_body_format eq 'JSON' ) {
             %payload = (
