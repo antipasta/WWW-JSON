@@ -11,7 +11,6 @@ use URI;
 use WWW::JSON::Response;
 use Data::Dumper::Concise;
 use Safe::Isa;
-use HTTP::Request::Common ();
 use JSON::XS;
 
 has ua => (
@@ -64,6 +63,17 @@ sub base_param {
     $self->base_params->{$k} = $v;
 }
 
+sub _create_post_body {
+    my ( $self, $p ) = @_;
+    if ( $self->post_body_format eq 'JSON' ) {
+        return (
+            'Content-Type' => 'application/json',
+            Content        => $self->json->encode($p)
+        );
+    }
+    return ( Content => $p );
+}
+
 sub _make_request {
     my ( $self, $method, $uri, $p ) = @_;
 
@@ -75,13 +85,7 @@ sub _make_request {
         if ( $method eq 'GET' ) {
             $uri->query_form( $uri->query_form, %$p );
         }
-        elsif ( $self->post_body_format eq 'JSON' ) {
-            %payload = (
-                'Content-Type' => 'application/json',
-                Content        => $self->json->encode($p)
-            );
-        }
-        else { %payload = ( Content => $p ) }
+        else { %payload = $self->_create_post_body($p) }
     }
     my $resp = $self->ua->$lwp_method( $uri->as_string, %payload );
 
