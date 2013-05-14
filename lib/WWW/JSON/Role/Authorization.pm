@@ -28,9 +28,8 @@ around _make_request => sub {
 
 sub handle_authorization_basic {
     my $self = shift;
-    my $auth = $self->authorization_basic;
-    $self->ua->default_headers->authorization_basic( $auth->{username},
-        $auth->{password} );
+    $self->ua->default_headers->authorization_basic(
+        @{ $self->authorization_basic }{qw/username password/} );
 }
 
 sub handle_authorization_oauth1 {
@@ -52,7 +51,7 @@ sub handle_authorization_oauth1 {
 }
 
 sub handle_authorization_oauth2 {
-    my ( $self, $method, $uri, $params ) = @_;
+    my $self =shift;
     my $token =
       ( $self->authorization_oauth2->can('access_token') )
       ? $self->authorization_oauth2->access_token
