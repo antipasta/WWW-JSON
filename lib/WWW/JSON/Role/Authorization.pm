@@ -21,9 +21,7 @@ around _make_request => sub {
         qw/authorization_basic authorization_oauth1 authorization_oauth2/)
     {
         my $handler = 'handle_' . $auth;
-        if ( $self->$auth ) {
-            $self->$handler(@_);
-        }
+        $self->$handler(@_) if ( $self->$auth );
     }
     $self->$orig(@_);
 };
