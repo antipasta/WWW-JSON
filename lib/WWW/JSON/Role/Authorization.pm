@@ -3,15 +3,27 @@ use Moo::Role;
 use Net::OAuth;
 $Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
 
-has authorization_basic  => ( is => 'rw' );
-has authorization_oauth1 => ( is => 'rw' );
-has authorization_oauth2 => ( is => 'rw' );
+for (
+    qw/authorization_basic
+    authorization_oauth1
+    authorization_oauth2/
+  )
+{
+    has $_  => ( is => 'rw', clearer => 1 );
+    before 'clear_' . $_ => sub {
+        shift->ua->default_headers->remove_header('Authorization');
+      }
+}
 
 around _make_request => sub {
     my ( $orig, $self ) = ( shift, shift );
-    for my $auth (qw/authorization_basic authorization_oauth1 authorization_oauth2/) {
+    for my $auth (
+        qw/authorization_basic authorization_oauth1 authorization_oauth2/)
+    {
         my $handler = 'handle_' . $auth;
-        $self->$handler(@_) if ( $self->$auth );
+        if ( $self->$auth ) {
+            $self->$handler(@_);
+        }
     }
     $self->$orig(@_);
 };
@@ -52,10 +64,10 @@ sub handle_authorization_oauth2 {
 }
 
 sub nonce {
-    my @chars = ('A'..'Z','a'..'z','0'..'9');
+    my @chars = ( 'A' .. 'Z', 'a' .. 'z', '0' .. '9' );
     my $nonce = time;
-    for (1 .. 15) {
-        $nonce .= $chars[rand @chars];
+    for ( 1 .. 15 ) {
+        $nonce .= $chars[ rand @chars ];
     }
     return $nonce;
 }
