@@ -32,7 +32,7 @@ has base_url => (
         return URI->new($base_url);
     }
 );
-has base_params => ( is => 'rw', default => sub { +{} } );
+has body_params => ( is => 'rw', default => sub { +{} } );
 has post_body_format =>
   ( is => 'rw', default => sub { 'serialized' }, clearer => 1 );
 has json => ( is => 'ro', default => sub { JSON::XS->new } );
@@ -49,18 +49,20 @@ sub req {
         $path =~ s|^/|./|;
         $path = URI->new($path);
     }
-
+    my $p =
+      ( $method eq 'GET' )
+      ? $params
+      : { %{ $self->body_params }, %{ $params // {} } };
     my $abs_uri =
       ( $path->scheme ) ? $path : URI->new_abs( $path, $self->base_url );
     $abs_uri->query_form( $path->query_form, $self->base_url->query_form );
-    my $p = { %{ $self->base_params }, %{ $params // {} } };
 
     return $self->_make_request( $method, $abs_uri, $p );
 }
 
-sub base_param {
+sub body_param {
     my ( $self, $k, $v ) = @_;
-    $self->base_params->{$k} = $v;
+    $self->body_param->{$k} = $v;
 }
 
 sub _create_post_body {
@@ -112,7 +114,7 @@ WWW::JSON - Make working with JSON Web API's as painless as possible
     
     my $wj = WWW::JSON->new(
         base_url    => 'https://graph.facebook.com',
-        base_params => { access_token => 'XXXXX' }
+        body_params => { access_token => 'XXXXX' }
     );
     my $r = $wj->get('/me', { fields => 'email' } );
     my $email = $r->res->{email} if ($r->success);
@@ -130,9 +132,15 @@ It tries to make working with these API's as intuitive as possible.
 
 The root url that all requests will be relative to.
 
-=head2 base_params
+Any query parameters included in the base_url will be added to every request made to the api
 
-Parameters that will be added to every request made by WWW::JSON. Useful for basic api keys
+Alternatively, an array ref consisting of the base_url and a hashref of query parameters can be passed like so:
+
+base_url => [ 'http://google.com', { key1 => 'val1', key2 => 'val2'} ]
+
+=head2 body_params
+
+Parameters that will be added to every non-GET request made by WWW::JSON.
 
 =head2 default_response_transform
 
@@ -182,9 +190,9 @@ Performs an HTTP request of type $method. $params is a hashref of parameters to 
 
 Set a default header for your requests
 
-=head2 base_param
+=head2 body_param
 
-Add/Update a single base param
+Add/Update a single body param
 
 
 =head1 LICENSE
