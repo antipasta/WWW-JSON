@@ -33,15 +33,25 @@ has base_url => (
     }
 );
 has body_params => ( is => 'rw', default => sub { +{} } );
-has post_body_format =>
-  ( is => 'rw', default => sub { 'serialized' }, clearer => 1 );
+has post_body_format => (
+    is      => 'rw',
+    default => sub { 'serialized' },
+    clearer => 1,
+    isa     => sub {
+        die "Invalid post_body_format $_[0]"
+          unless ( $_[0] eq 'serialized' || $_[0] eq 'JSON' );
+    }
+);
 has json => ( is => 'ro', default => sub { JSON::XS->new } );
 
 has default_response_transform => ( is => 'rw', clearer => 1 );
 with 'WWW::JSON::Role::Authorization';
 
-sub get  { shift->req( 'GET',  @_ ) }
-sub post { shift->req( 'POST', @_ ) }
+sub get    { shift->req( 'GET',    @_ ) }
+sub post   { shift->req( 'POST',   @_ ) }
+sub put    { shift->req( 'PUT',    @_ ) }
+sub delete { shift->req( 'DELETE', @_ ) }
+sub head   { shift->req( 'HEAD',   @_ ) }
 
 sub req {
     my ( $self, $method, $path, $params ) = @_;

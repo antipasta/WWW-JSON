@@ -3,13 +3,13 @@ use Moo::Role;
 use Net::OAuth;
 $Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
 
-for (
+my @AUTH_TYPES = (
     qw/authorization_basic
-    authorization_oauth1
-    authorization_oauth2/
-  )
-{
-    has $_  => ( is => 'rw', clearer => 1 );
+      authorization_oauth1
+      authorization_oauth2/
+);
+for (@AUTH_TYPES) {
+    has $_ => ( is => 'rw', clearer => 1 );
     before 'clear_' . $_ => sub {
         shift->ua->default_headers->remove_header('Authorization');
       }
@@ -17,13 +17,13 @@ for (
 
 around _make_request => sub {
     my ( $orig, $self ) = ( shift, shift );
-    for my $auth (
-        qw/authorization_basic authorization_oauth1 authorization_oauth2/)
-    {
+    for my $auth (@AUTH_TYPES) {
         my $handler = 'handle_' . $auth;
         $self->$handler(@_) if ( $self->$auth );
     }
-    $self->$orig(@_);
+    my $res = $self->$orig(@_);
+    $self->ua->default_headers->remove_header('Authorization');
+    return $res;
 };
 
 sub handle_authorization_basic {
@@ -51,7 +51,7 @@ sub handle_authorization_oauth1 {
 }
 
 sub handle_authorization_oauth2 {
-    my $self =shift;
+    my $self = shift;
     my $token =
       ( $self->authorization_oauth2->can('access_token') )
       ? $self->authorization_oauth2->access_token
