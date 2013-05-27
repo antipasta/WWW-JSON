@@ -46,7 +46,7 @@ has json => ( is => 'ro', default => sub { JSON::XS->new } );
 
 
 has default_response_transform => ( is => 'rw', clearer => 1 );
-with 'WWW::JSON::Role::Authorization';
+with 'WWW::JSON::Role::Authentication';
 sub get    { shift->req( 'GET',    @_ ) }
 sub post   { shift->req( 'POST',   @_ ) }
 sub put    { shift->req( 'PUT',    @_ ) }
@@ -216,9 +216,23 @@ Accepts a hashref of basic HTTP auth credentials in the format { username => 'an
 
 Every request made by WWW::JSON will use these credentials.
 
-=head2 authorization_oauth1
+=head2 authentication
 
-Accepts a hashref of OAuth 1.0A credentials. All requests made by WWW::JSON will use these credentias.
+Accepts a single key value pair, where the key is the authentication method and the value is the auth data that method requires.
+
+Types include:
+
+oauth1 => {
+    consumer_key    => 'somekey',
+    consumer_secret => 'somesecret',
+    token           => 'sometoken',
+    token_secret    => 'sometokensecret'
+  }
+
+basic => { username => 'antipasta', password => 'hunter2' }
+
+oauth2 => Net::OAuth2::AccessToken->new( ... )
+
 
 
 =head1 METHODS

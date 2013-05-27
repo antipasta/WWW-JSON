@@ -1,29 +1,29 @@
-package WWW::JSON::Role::Authorization;
+package WWW::JSON::Role::Authentication;
 use Moo::Role;
 use Net::OAuth;
 use Safe::Isa;
 use Data::Dumper::Concise;
 $Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
 
-has authorization => (
+has authentication => (
     is      => 'rw',
     clearer => 1,
     default => sub { +{} },
     isa     => sub {
-        die "Only 1 authorization method can be supplied "
+        die "Only 1 authentication method can be supplied "
           unless keys( %{ $_[0] } ) <= 1;
     }
 );
 
-before clear_authorization => sub {
+before clear_authentication => sub {
     my $self = shift;
     $self->ua->default_headers->remove_header('Authorization')
-      if ( $self->authorization );
+      if ( $self->authentication );
 };
 
 around _make_request => sub {
     my ( $orig, $self ) = ( shift, shift );
-    if ( my ( $auth_type, $auth ) = %{ $self->authorization } ) {
+    if ( my ( $auth_type, $auth ) = %{ $self->authentication } ) {
         my $handler = '_handle_' . $auth_type;
         die "No handler found for auth type [$auth_type]"
           unless ( $self->can($handler) );
