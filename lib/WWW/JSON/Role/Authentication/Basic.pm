@@ -1,6 +1,5 @@
 package WWW::JSON::Role::Authentication::Basic;
 use Moo::Role;
-use Safe::Isa;
 requires 'authentication';
 requires 'ua';
 

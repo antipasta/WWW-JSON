@@ -1,6 +1,5 @@
 package WWW::JSON::Role::Authentication::OAuth1;
 use Moo::Role;
-use Safe::Isa;
 use Net::OAuth;
 $Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
 requires 'authentication';

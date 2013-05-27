@@ -1,7 +1,5 @@
 package WWW::JSON::Role::Authentication;
 use Moo::Role;
-use Safe::Isa;
-use Data::Dumper::Concise;
 
 has authentication => (
     is      => 'rw',
