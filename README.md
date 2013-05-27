@@ -20,6 +20,47 @@ WWW::JSON is an easy interface to any modern web API that returns JSON.
 
 It tries to make working with these API's as intuitive as possible.
 
+# WHY SHOULD I CARE?
+
+When using abstracted libraries I often ran into issues where bugs in the library interfere with proper api interactions, or features  are added to the API that the library doesn't support.
+
+In these cases the additional abstraction winds up making life more difficult.
+
+Abstracted libraries do offer benefits.
+
+    -Auth is taken care of for you.
+    -Cuts out boilerplate
+    -Don't have to think about HTTP status, JSON, or parameter serialization
+
+I wanted just enough abstraction to get the above benefits, but no more.
+
+Thus, WWW::JSON was born. Perl + Web + JSON - tears
+
+# WHAT YOU GET
+
+\-Light on dependencies
+
+\-Don't repeat yourself
+    -Set a url that all requests will be relative to
+    -Set query params included on all requests
+    -Set body params included on all requests that contain a POST body
+    -Transform the response of all API requests. Useful if an API returns data in a silly structure.
+
+\-Work with APIs that require different parameter serialization
+    - Serialized post bodys (Facebook, Foursquare)
+    - JSON-ified post bodys (Github, Google+)
+
+\-Authentication
+    -Basic
+    -OAuth 1.0a
+    -OAuth2
+
+\-Avoids boilerplate
+    -Don't have to worry about going from JSON => perl and back
+    -Handles HTTP and JSON decode errors gracefully
+
+
+
 
 
 # PARAMETERS
@@ -106,3 +147,13 @@ it under the same terms as Perl itself.
 # AUTHOR
 
 Joe Papperello <antipasta@cpan.org>
+
+# SEE ALSO
+
+\-App::Adenosine - Using this on the command line definitely served as some inspiration for WWW::JSON.
+
+\-Net::HTTP::Spore - I found this while researching other modules in this space. It's still a bit abstracted from the actual web request for my taste, but it's obvious the author created it out of some of the same above frustrations and it looks useful.
+
+
+
+
