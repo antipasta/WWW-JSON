@@ -1,7 +1,16 @@
 package WWW::JSON::Role::Authentication::OAuth2;
 use Moo::Role;
+use Safe::Isa;
 requires 'authentication';
 requires 'ua';
+
+sub _validate_OAuth2 {
+    my ( $self, $auth ) = @_;
+    die "Must pass a Net::OAuth2::AccessToken object when using "
+      . __PACKAGE__
+      . " authentication."
+      unless $self->$_isa('Net::OAuth2');
+}
 
 sub _auth_OAuth2 {
     my ( $self, $auth ) = @_;

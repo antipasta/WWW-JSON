@@ -5,6 +5,14 @@ $Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
 requires 'authentication';
 requires 'ua';
 
+sub _validate_OAuth1 {
+    my ( $self, $auth ) = @_;
+    for (qw/consumer_key consumer_secret token token_secret/) {
+        die "Required parameter $_ missing for " . __PACKAGE__ . " authentication"
+          unless exists( $auth->{$_} );
+    }
+}
+
 sub _auth_OAuth1 {
     my ( $self, $auth, $method, $uri, $params ) = @_;
 

@@ -1,5 +1,6 @@
 package WWW::JSON::Role::Authentication;
 use Moo::Role;
+use Data::Dumper::Concise;
 has authentication => (
     is      => 'rw',
     clearer => 1,
@@ -8,8 +9,30 @@ has authentication => (
         return if ref( $_[0] ) eq 'CODE';
         die "Only 1 authentication method can be supplied "
           unless keys( %{ $_[0] } ) <= 1;
-    }
+    },
+    trigger => 1,
+
 );
+
+sub _trigger_authentication {
+    my ( $self, $auth ) = @_;
+    return if ref($auth) eq 'CODE';
+
+    my ( $name, $data ) = %$auth;
+    my $role = __PACKAGE__ . '::' . $name;
+
+    warn "APPLYING[$role] " . Dumper($data);
+
+    Moo::Role->apply_roles_to_object( $self, $role )
+      unless $self->does($role);
+
+    my $handler   = '_auth_' . $name;
+    my $validator = '_validate_' . $name;
+
+    die "No handler found for auth type [$name]"
+      unless ( $self->can($handler) );
+    $self->$validator($data) if ( $self->can($validator) );
+}
 
 before clear_authentication => sub {
     my $self = shift;
@@ -23,18 +46,16 @@ around _make_request => sub {
         $self->authentication->( $self, @_ );
     }
     elsif ( my ( $auth_type, $auth ) = %{ $self->authentication } ) {
-        my $role = __PACKAGE__ . '::' . $auth_type;
-        Moo::Role->apply_roles_to_object( $self, $role )
-          unless $self->does($role);
-        my $handler = '_auth_' . $auth_type;
-        die "No handler found for auth type [$auth_type]"
-          unless ( $self->can($handler) );
+        my $handler   = '_auth_' . $auth_type;
         $self->$handler( $auth, @_ );
-        my $res = $self->$orig(@_);
-        $self->ua->default_headers->remove_header('Authorization');
-        return $res;
     }
     return $self->$orig(@_);
+};
+
+after _make_request => sub {
+    my $self = shift;
+    $self->ua->default_headers->remove_header('Authorization')
+      if ( $self->authentication );
 };
 
 with qw/WWW::JSON::Role::Authentication::Basic
