@@ -44,14 +44,15 @@ has post_body_format => (
 );
 has json => ( is => 'ro', default => sub { JSON::XS->new } );
 
+
 has default_response_transform => ( is => 'rw', clearer => 1 );
 with 'WWW::JSON::Role::Authorization';
-
 sub get    { shift->req( 'GET',    @_ ) }
 sub post   { shift->req( 'POST',   @_ ) }
 sub put    { shift->req( 'PUT',    @_ ) }
 sub delete { shift->req( 'DELETE', @_ ) }
 sub head   { shift->req( 'HEAD',   @_ ) }
+
 
 sub req {
     my ( $self, $method, $path, $params ) = @_;

@@ -1,42 +1,54 @@
 package WWW::JSON::Role::Authorization;
 use Moo::Role;
 use Net::OAuth;
+use Safe::Isa;
+use Data::Dumper::Concise;
 $Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
 
-my @AUTH_TYPES = (
-    qw/authorization_basic
-      authorization_oauth1
-      authorization_oauth2/
-);
-for (@AUTH_TYPES) {
-    has $_ => ( is => 'rw', clearer => 1 );
-    before 'clear_' . $_ => sub {
-        shift->ua->default_headers->remove_header('Authorization');
-      }
-}
+has authorization => ( is => 'rw', clearer => 1 );
 
-around _make_request => sub {
+before 'clear_authorization' => sub {
+    my $self = shift;
+    $self->ua->default_headers->remove_header('Authorization')
+      if ( $self->authorization );
+  }
+
+  around _make_request => sub {
     my ( $orig, $self ) = ( shift, shift );
-    for my $auth (@AUTH_TYPES) {
-        my $handler = 'handle_' . $auth;
-        $self->$handler(@_) if ( $self->$auth );
+    my $auth = $self->authorization_type;
+    warn $auth;
+    if ($auth) {
+        my $handler = '_handle_' . $auth;
+        $self->$handler(@_);
     }
     my $res = $self->$orig(@_);
-    $self->ua->default_headers->remove_header('Authorization');
+    $self->ua->default_headers->remove_header('Authorization') if ($auth);
     return $res;
-};
+  };
 
-sub handle_authorization_basic {
+sub authorization_type {
     my $self = shift;
-    $self->ua->default_headers->authorization_basic(
-        @{ $self->authorization_basic }{qw/username password/} );
+    return unless ( $self->authorization );
+    return 'basic'
+      if ( $self->authorization->{username} );
+    return 'oauth1'
+      if ( $self->authorization->{consumer_key} );
+    return 'oauth2' if ( $self->authoriation->$_isa('Net::OAuth2') );
+    die
+"Cannot detect authorization type, invalid authorization parameters specified.";
 }
 
-sub handle_authorization_oauth1 {
+sub _handle_basic {
+    my $self = shift;
+    $self->ua->default_headers->authorization_basic(
+        @{ $self->authorization }{qw/username password/} );
+}
+
+sub _handle_oauth1 {
     my ( $self, $method, $uri, $params ) = @_;
 
     my $request = Net::OAuth->request("protected resource")->new(
-        %{ $self->authorization_oauth1 },
+        %{ $self->authorization },
         request_url      => $uri->as_string,
         request_method   => $method,
         signature_method => 'HMAC-SHA1',
@@ -50,14 +62,14 @@ sub handle_authorization_oauth1 {
         Authorization => $request->to_authorization_header );
 }
 
-sub handle_authorization_oauth2 {
+sub _handle_oauth2 {
     my $self = shift;
     my $token =
-      ( $self->authorization_oauth2->can('access_token') )
-      ? $self->authorization_oauth2->access_token
-      : $self->authorization_oauth2;
-    $self->ua->default_header( Authorization => 'Bearer '
-          . $self->authorization_oauth2->access_token );
+      ( $self->authorization->can('access_token') )
+      ? $self->authorization->access_token
+      : $self->authorization;
+    $self->ua->default_header(
+        Authorization => 'Bearer ' . $self->authorization->access_token );
 }
 
 sub nonce {
