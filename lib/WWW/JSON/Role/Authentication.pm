@@ -3,6 +3,7 @@ use Moo::Role;
 use Data::Dumper::Concise;
 has authentication => (
     is      => 'rw',
+    lazy => 1,
     clearer => 1,
     default => sub { +{} },
     isa     => sub {
