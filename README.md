@@ -103,9 +103,24 @@ Accepts a hashref of basic HTTP auth credentials in the format { username => 'an
 
 Every request made by WWW::JSON will use these credentials.
 
-## authorization\_oauth1
+## authentication
 
-Accepts a hashref of OAuth 1.0A credentials. All requests made by WWW::JSON will use these credentias.
+Accepts a single key value pair, where the key is the authentication method and the value is the auth data that method requires.
+
+Types include:
+
+oauth1 => {
+    consumer\_key    => 'somekey',
+    consumer\_secret => 'somesecret',
+    token           => 'sometoken',
+    token\_secret    => 'sometokensecret'
+  }
+
+basic => { username => 'antipasta', password => 'hunter2' }
+
+oauth2 => Net::OAuth2::AccessToken->new( ... )
+
+
 
 
 
