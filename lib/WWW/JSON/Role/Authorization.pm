@@ -5,50 +5,46 @@ use Safe::Isa;
 use Data::Dumper::Concise;
 $Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
 
-has authorization => ( is => 'rw', clearer => 1 );
+has authorization => (
+    is      => 'rw',
+    clearer => 1,
+    isa     => sub {
+        die "Only 1 authorization method can be supplied "
+          unless keys( %{$_[0]} ) == 1;
+    }
+);
 
-before 'clear_authorization' => sub {
+before clear_authorization => sub {
     my $self = shift;
     $self->ua->default_headers->remove_header('Authorization')
       if ( $self->authorization );
-  }
+};
 
-  around _make_request => sub {
+around _make_request => sub {
     my ( $orig, $self ) = ( shift, shift );
-    my $auth = $self->authorization_type;
-    warn $auth;
-    if ($auth) {
-        my $handler = '_handle_' . $auth;
-        $self->$handler(@_);
+    if(my ($auth_type,$auth) = %{$self->authorization}){
+        warn $auth_type . " " . Dumper($auth);
+        my $handler = '_handle_' . $auth_type;
+        die "No handler found for auth type [$auth_type]" unless ($self->can($handler));
+        $self->$handler($auth,@_);
+        my $res = $self->$orig(@_);
+        $self->ua->default_headers->remove_header('Authorization');
+        return $res;
     }
-    my $res = $self->$orig(@_);
-    $self->ua->default_headers->remove_header('Authorization') if ($auth);
-    return $res;
-  };
-
-sub authorization_type {
-    my $self = shift;
-    return unless ( $self->authorization );
-    return 'basic'
-      if ( $self->authorization->{username} );
-    return 'oauth1'
-      if ( $self->authorization->{consumer_key} );
-    return 'oauth2' if ( $self->authoriation->$_isa('Net::OAuth2') );
-    die
-"Cannot detect authorization type, invalid authorization parameters specified.";
-}
+    return $self->$orig(@_);
+};
 
 sub _handle_basic {
-    my $self = shift;
+    my ($self,$auth) = @_;
     $self->ua->default_headers->authorization_basic(
-        @{ $self->authorization }{qw/username password/} );
+        @$auth{qw/username password/} );
 }
 
 sub _handle_oauth1 {
-    my ( $self, $method, $uri, $params ) = @_;
+    my ( $self, $auth, $method, $uri, $params ) = @_;
 
     my $request = Net::OAuth->request("protected resource")->new(
-        %{ $self->authorization },
+        %$auth,
         request_url      => $uri->as_string,
         request_method   => $method,
         signature_method => 'HMAC-SHA1',
@@ -63,13 +59,9 @@ sub _handle_oauth1 {
 }
 
 sub _handle_oauth2 {
-    my $self = shift;
-    my $token =
-      ( $self->authorization->can('access_token') )
-      ? $self->authorization->access_token
-      : $self->authorization;
+    my ( $self, $auth ) = shift;
     $self->ua->default_header(
-        Authorization => 'Bearer ' . $self->authorization->access_token );
+        Authorization => 'Bearer ' . $auth->access_token );
 }
 
 sub nonce {
