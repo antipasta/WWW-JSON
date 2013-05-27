@@ -41,12 +41,14 @@ Thus, WWW::JSON was born. Perl + Web + JSON - tears
 \-Light on dependencies
 
 \-Don't repeat yourself
+
     -Set a url that all requests will be relative to
     -Set query params included on all requests
     -Set body params included on all requests that contain a POST body
     -Transform the response of all API requests. Useful if an API returns data in a silly structure.
 
 \-Work with APIs that require different parameter serialization
+
     - Serialized post bodys (Facebook, Foursquare)
     - JSON-ified post bodys (Github, Google+)
 
