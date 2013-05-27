@@ -9,7 +9,7 @@ sub _validate_OAuth2 {
     die "Must pass a Net::OAuth2::AccessToken object when using "
       . __PACKAGE__
       . " authentication."
-      unless $self->$_isa('Net::OAuth2::AccessToken');
+      unless $auth->$_isa('Net::OAuth2::AccessToken');
 }
 
 sub _auth_OAuth2 {
