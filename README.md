@@ -9,7 +9,7 @@ WWW::JSON - Make working with JSON Web API's as painless as possible
 
     my $wj = WWW::JSON->new(
         base_url    => 'https://graph.facebook.com',
-        base_params => { access_token => 'XXXXX' }
+        body_params => { access_token => 'XXXXX' }
     );
     my $r = $wj->get('/me', { fields => 'email' } );
     my $email = $r->res->{email} if ($r->success);
@@ -28,9 +28,15 @@ It tries to make working with these API's as intuitive as possible.
 
 The root url that all requests will be relative to.
 
-## base\_params
+Any query parameters included in the base\_url will be added to every request made to the api
 
-Parameters that will be added to every request made by WWW::JSON. Useful for basic api keys
+Alternatively, an array ref consisting of the base\_url and a hashref of query parameters can be passed like so:
+
+base\_url => \[ 'http://google.com', { key1 => 'val1', key2 => 'val2'} \]
+
+## body\_params
+
+Parameters that will be added to every non-GET request made by WWW::JSON.
 
 ## default\_response\_transform
 
@@ -72,19 +78,21 @@ $wj->post($path,$params)
 
 Performs a POST request. $params is a hashref of parameters to be passed to the post body
 
+## put
+
+$wj->put($path,$params)
+
+Performs a PUT request. $params is a hashref of parameters to be passed to the post body
+
 ## req
 
 $wj->req($method,$path,$params)
 
 Performs an HTTP request of type $method. $params is a hashref of parameters to be passed to the post body
 
-## default\_header
+## body\_param
 
-Set a default header for your requests
-
-## base\_param
-
-Add/Update a single base param
+Add/Update a single body param
 
 
 
