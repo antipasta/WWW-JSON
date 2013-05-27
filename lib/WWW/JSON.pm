@@ -190,15 +190,17 @@ $wj->post($path,$params)
 
 Performs a POST request. $params is a hashref of parameters to be passed to the post body
 
+=head2 put
+
+$wj->put($path,$params)
+
+Performs a PUT request. $params is a hashref of parameters to be passed to the post body
+
 =head2 req
 
 $wj->req($method,$path,$params)
 
 Performs an HTTP request of type $method. $params is a hashref of parameters to be passed to the post body
-
-=head2 default_header
-
-Set a default header for your requests
 
 =head2 body_param
 
