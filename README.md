@@ -22,7 +22,7 @@ It tries to make working with these API's as intuitive as possible.
 
 # WHY SHOULD I CARE?
 
-When using abstracted libraries I often ran into issues where bugs in the library interfere with proper api interactions, or features  are added to the API that the library doesn't support.
+When using abstracted web API libraries I often ran into issues where bugs in the library interfere with proper api interactions, or features  are added to the API that the library doesn't support.
 
 In these cases the additional abstraction winds up making life more difficult.
 
