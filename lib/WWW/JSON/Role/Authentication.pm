@@ -1,9 +1,7 @@
 package WWW::JSON::Role::Authentication;
 use Moo::Role;
-use Net::OAuth;
 use Safe::Isa;
 use Data::Dumper::Concise;
-$Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
 
 has authentication => (
     is      => 'rw',
@@ -35,43 +33,10 @@ around _make_request => sub {
     return $self->$orig(@_);
 };
 
-sub _handle_basic {
-    my ( $self, $auth ) = @_;
-    $self->ua->default_headers->authorization_basic(
-        @$auth{qw/username password/} );
-}
 
-sub _handle_oauth1 {
-    my ( $self, $auth, $method, $uri, $params ) = @_;
 
-    my $request = Net::OAuth->request("protected resource")->new(
-        %$auth,
-        request_url      => $uri->as_string,
-        request_method   => $method,
-        signature_method => 'HMAC-SHA1',
-        timestamp        => time(),
-        nonce            => nonce(),
-        extra_params     => $params,
-    );
-    $request->sign;
-    $request->to_authorization_header;
-    $self->ua->default_header(
-        Authorization => $request->to_authorization_header );
-}
-
-sub _handle_oauth2 {
-    my ( $self, $auth ) = shift;
-    $self->ua->default_header(
-        Authorization => 'Bearer ' . $auth->access_token );
-}
-
-sub nonce {
-    my @chars = ( 'A' .. 'Z', 'a' .. 'z', '0' .. '9' );
-    my $nonce = time;
-    for ( 1 .. 15 ) {
-        $nonce .= $chars[ rand @chars ];
-    }
-    return $nonce;
-}
+with qw/WWW::JSON::Role::Authentication::Basic
+  WWW::JSON::Role::Authentication::OAuth1
+  WWW::JSON::Role::Authentication::OAuth2/;
 
 1;
