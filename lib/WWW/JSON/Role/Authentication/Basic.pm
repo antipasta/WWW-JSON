@@ -3,7 +3,7 @@ use Moo::Role;
 requires 'authentication';
 requires 'ua';
 
-sub _handle_basic {
+sub _auth_Basic {
     my ( $self, $auth ) = @_;
     $self->ua->default_headers->authorization_basic(
         @$auth{qw/username password/} );

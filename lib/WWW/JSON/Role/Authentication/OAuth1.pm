@@ -5,7 +5,7 @@ $Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
 requires 'authentication';
 requires 'ua';
 
-sub _handle_oauth1 {
+sub _auth_OAuth1 {
     my ( $self, $auth, $method, $uri, $params ) = @_;
 
     my $request = Net::OAuth->request("protected resource")->new(

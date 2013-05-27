@@ -3,7 +3,7 @@ use Moo::Role;
 requires 'authentication';
 requires 'ua';
 
-sub _handle_oauth2 {
+sub _auth_OAuth2 {
     my ( $self, $auth ) = @_;
     $self->ua->default_header(
         Authorization => 'Bearer ' . $auth->access_token );

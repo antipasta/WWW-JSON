@@ -52,11 +52,12 @@ Thus, WWW::JSON was born. Perl + Web + JSON - tears
     - Serialized post bodys (Facebook, Foursquare)
     - JSON-ified post bodys (Github, Google+)
 
-\-Authentication
+\-Role-based Authentication
 
     -Basic
     -OAuth 1.0a
     -OAuth2
+    -New roles can easily be created for other auth schemes
 
 \-Avoids boilerplate
 
@@ -105,24 +106,22 @@ Every request made by WWW::JSON will use these credentials.
 
 ## authentication
 
-Accepts a single key value pair, where the key is the authentication method and the value is the auth data that method requires.
+Accepts a single key value pair, where the key is the name of a WWW::JSON::Role::Authentication role and the value is a hashref containing the data the role needs to perform the authentication.
 
-Types include:
+Supported authentication schemes:
 
-oauth1 => {
+OAuth1 => {
     consumer\_key    => 'somekey',
     consumer\_secret => 'somesecret',
     token           => 'sometoken',
     token\_secret    => 'sometokensecret'
   }
 
-basic => { username => 'antipasta', password => 'hunter2' }
+Basic => { username => 'antipasta', password => 'hunter2' }
 
-oauth2 => Net::OAuth2::AccessToken->new( ... )
+OAuth2 => Net::OAuth2::AccessToken->new( ... )
 
-
-
-
+New roles can be created to support different types of authentication. Documentation on this will be fleshed out at a later time.
 
 # METHODS
 
