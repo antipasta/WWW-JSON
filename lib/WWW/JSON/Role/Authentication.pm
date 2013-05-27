@@ -23,7 +23,7 @@ around _make_request => sub {
         $self->authentication->( $self, @_ );
     }
     elsif ( my ( $auth_type, $auth ) = %{ $self->authentication } ) {
-        my $role = __PACKAGE__ . $auth_type;
+        my $role = __PACKAGE__ . '::' . $auth_type;
         Moo::Role->apply_roles_to_object( $self, $role )
           unless $self->does($role);
         my $handler = '_auth_' . $auth_type;
