@@ -53,11 +53,13 @@ Thus, WWW::JSON was born. Perl + Web + JSON - tears
     - JSON-ified post bodys (Github, Google+)
 
 \-Authentication
+
     -Basic
     -OAuth 1.0a
     -OAuth2
 
 \-Avoids boilerplate
+
     -Don't have to worry about going from JSON => perl and back
     -Handles HTTP and JSON decode errors gracefully
 
