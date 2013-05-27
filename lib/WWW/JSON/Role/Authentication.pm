@@ -16,6 +16,7 @@ has authentication => (
 
 sub _trigger_authentication {
     my ( $self, $auth ) = @_;
+    return unless ($auth);
     return if ref($auth) eq 'CODE';
 
     my ( $name, $data ) = %$auth;
