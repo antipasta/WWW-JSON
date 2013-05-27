@@ -8,9 +8,10 @@ $Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
 has authorization => (
     is      => 'rw',
     clearer => 1,
+    default => sub { +{} },
     isa     => sub {
         die "Only 1 authorization method can be supplied "
-          unless keys( %{$_[0]} ) == 1;
+          unless keys( %{$_[0]} ) <= 1;
     }
 );
 
