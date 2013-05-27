@@ -11,7 +11,7 @@ has authorization => (
     default => sub { +{} },
     isa     => sub {
         die "Only 1 authorization method can be supplied "
-          unless keys( %{$_[0]} ) <= 1;
+          unless keys( %{ $_[0] } ) <= 1;
     }
 );
 
@@ -23,11 +23,11 @@ before clear_authorization => sub {
 
 around _make_request => sub {
     my ( $orig, $self ) = ( shift, shift );
-    if(my ($auth_type,$auth) = %{$self->authorization}){
-        warn $auth_type . " " . Dumper($auth);
+    if ( my ( $auth_type, $auth ) = %{ $self->authorization } ) {
         my $handler = '_handle_' . $auth_type;
-        die "No handler found for auth type [$auth_type]" unless ($self->can($handler));
-        $self->$handler($auth,@_);
+        die "No handler found for auth type [$auth_type]"
+          unless ( $self->can($handler) );
+        $self->$handler( $auth, @_ );
         my $res = $self->$orig(@_);
         $self->ua->default_headers->remove_header('Authorization');
         return $res;
@@ -36,7 +36,7 @@ around _make_request => sub {
 };
 
 sub _handle_basic {
-    my ($self,$auth) = @_;
+    my ( $self, $auth ) = @_;
     $self->ua->default_headers->authorization_basic(
         @$auth{qw/username password/} );
 }
