@@ -23,8 +23,6 @@ sub _trigger_authentication {
     my ( $name, $data ) = %$auth;
     my $role = __PACKAGE__ . '::' . $name;
 
-    warn "APPLYING[$role] " . Dumper($data);
-
     Moo::Role->apply_roles_to_object( $self, $role )
       unless $self->does($role);
 

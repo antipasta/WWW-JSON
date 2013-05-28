@@ -55,7 +55,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::Mock::LWP::Dispatch" : "0.05",
+            "Test::Mock::LWP::Dispatch" : "0.06",
             "Test::More" : "0.98"
          }
       }
