@@ -37,7 +37,14 @@ has post_body_format =>
   ( is => 'rw', default => sub { 'serialized' }, clearer => 1 );
 has json => ( is => 'ro', default => sub { JSON::XS->new } );
 
-has default_response_transform => ( is => 'rw', clearer => 1 );
+has default_response_transform => (
+    is      => 'rw',
+    clearer => 1,
+    isa     => sub {
+        die "default_response_transform takes a coderef"
+          unless ref( $_[0] ) eq 'CODE';
+    }
+);
 with 'WWW::JSON::Role::Authorization';
 
 sub get  { shift->req( 'GET',  @_ ) }
