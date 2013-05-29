@@ -9,7 +9,7 @@ WWW::JSON - Make working with JSON Web API's as painless as possible
 
     my $wj = WWW::JSON->new(
         base_url    => 'https://graph.facebook.com',
-        base_params => { access_token => 'XXXXX' }
+        body_params => { access_token => 'XXXXX' }
     );
     my $r = $wj->get('/me', { fields => 'email' } );
     my $email = $r->res->{email} if ($r->success);
@@ -20,6 +20,52 @@ WWW::JSON is an easy interface to any modern web API that returns JSON.
 
 It tries to make working with these API's as intuitive as possible.
 
+# WHY SHOULD I CARE?
+
+When using abstracted web API libraries I often ran into issues where bugs in the library interfere with proper api interactions, or features  are added to the API that the library doesn't support.
+
+In these cases the additional abstraction winds up making life more difficult.
+
+Abstracted libraries do offer benefits.
+
+    -Auth is taken care of for you.
+    -Cuts out boilerplate
+    -Don't have to think about HTTP status, JSON, or parameter serialization
+
+I wanted just enough abstraction to get the above benefits, but no more.
+
+Thus, WWW::JSON was born. Perl + Web + JSON - tears
+
+# WHAT YOU GET
+
+\-Light on dependencies
+
+\-Don't repeat yourself
+
+    -Set a url that all requests will be relative to
+    -Set query params included on all requests
+    -Set body params included on all requests that contain a POST body
+    -Transform the response of all API requests. Useful if an API returns data in a silly structure.
+
+\-Work with APIs that require different parameter serialization
+
+    - Serialized post bodys (Facebook, Foursquare)
+    - JSON-ified post bodys (Github, Google+)
+
+\-Role-based Authentication
+
+    -Basic
+    -OAuth 1.0a
+    -OAuth2
+    -New roles can easily be created for other auth schemes
+
+\-Avoids boilerplate
+
+    -Don't have to worry about going from JSON => perl and back
+    -Handles HTTP and JSON decode errors gracefully
+
+
+
 
 
 # PARAMETERS
@@ -28,9 +74,15 @@ It tries to make working with these API's as intuitive as possible.
 
 The root url that all requests will be relative to.
 
-## base\_params
+Any query parameters included in the base\_url will be added to every request made to the api
 
-Parameters that will be added to every request made by WWW::JSON. Useful for basic api keys
+Alternatively, an array ref consisting of the base\_url and a hashref of query parameters can be passed like so:
+
+base\_url => \[ 'http://google.com', { key1 => 'val1', key2 => 'val2'} \]
+
+## body\_params
+
+Parameters that will be added to every non-GET request made by WWW::JSON.
 
 ## default\_response\_transform
 
@@ -52,11 +104,24 @@ Accepts a hashref of basic HTTP auth credentials in the format { username => 'an
 
 Every request made by WWW::JSON will use these credentials.
 
-## authorization\_oauth1
+## authentication
 
-Accepts a hashref of OAuth 1.0A credentials. All requests made by WWW::JSON will use these credentias.
+Accepts a single key value pair, where the key is the name of a WWW::JSON::Role::Authentication role and the value is a hashref containing the data the role needs to perform the authentication.
 
+Supported authentication schemes:
 
+OAuth1 => {
+    consumer\_key    => 'somekey',
+    consumer\_secret => 'somesecret',
+    token           => 'sometoken',
+    token\_secret    => 'sometokensecret'
+  }
+
+Basic => { username => 'antipasta', password => 'hunter2' }
+
+OAuth2 => Net::OAuth2::AccessToken->new( ... )
+
+New roles can be created to support different types of authentication. Documentation on this will be fleshed out at a later time.
 
 # METHODS
 
@@ -72,19 +137,21 @@ $wj->post($path,$params)
 
 Performs a POST request. $params is a hashref of parameters to be passed to the post body
 
+## put
+
+$wj->put($path,$params)
+
+Performs a PUT request. $params is a hashref of parameters to be passed to the post body
+
 ## req
 
 $wj->req($method,$path,$params)
 
 Performs an HTTP request of type $method. $params is a hashref of parameters to be passed to the post body
 
-## default\_header
+## body\_param
 
-Set a default header for your requests
-
-## base\_param
-
-Add/Update a single base param
+Add/Update a single body param
 
 
 
@@ -98,3 +165,13 @@ it under the same terms as Perl itself.
 # AUTHOR
 
 Joe Papperello <antipasta@cpan.org>
+
+# SEE ALSO
+
+\-App::Adenosine - Using this on the command line definitely served as some inspiration for WWW::JSON.
+
+\-Net::HTTP::Spore - I found this while researching other modules in this space. It's still a bit abstracted from the actual web request for my taste, but it's obvious the author created it out of some of the same above frustrations and it looks useful.
+
+
+
+

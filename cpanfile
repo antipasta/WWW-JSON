@@ -2,7 +2,7 @@ requires 'perl', '5.008001';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';
-    requires 'Test::Mock::LWP::Dispatch', '0.05';
+    requires 'Test::Mock::LWP::Dispatch', '0.06';
 };
 
 on 'runtime' => sub {

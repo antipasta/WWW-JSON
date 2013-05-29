@@ -23,8 +23,9 @@ my %args = (
         'Module::Build' => 0.38,
     },
 
-    name        => 'WWW-JSON',
-    module_name => 'WWW::JSON',
+    name            => 'WWW-JSON',
+    module_name     => 'WWW::JSON',
+    allow_pure_perl => 0,
 
     script_files => [glob('script/*'), glob('bin/*')],
 
