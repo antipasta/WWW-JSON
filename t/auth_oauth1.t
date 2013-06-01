@@ -69,7 +69,7 @@ ok my $wj = WWW::JSON->new(
 ok my $get = $wj->get( '/get/request', { 'abc' => 123 } ),
   'made oauth get request';
 is $get->res->{success}, 'get request working', 'get request response correct';
-my $post = $wj->post( '/post/request', { a => 'b', x => 'y' } ),
+ok my $post = $wj->post( '/post/request', { a => 'b', x => 'y' } ),
   'made oauth post request';
 is $post->res->{success}, 'post request working',
   'post request response correct';
