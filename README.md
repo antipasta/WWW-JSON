@@ -35,7 +35,7 @@ I wanted just enough abstraction to get the above benefits, but no more.
 
 Thus, WWW::JSON was born. Perl + Web + JSON - tears
 
-## WHAT YOU GET
+## FEATURES
 
 \-Light on dependencies
 
