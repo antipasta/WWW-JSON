@@ -18,7 +18,7 @@ $fake_ua->map(
         my $req = shift;
         my $auth = 'antipasta:hunter2';
         is scalar($req->authorization_basic),$auth, 'Got correct auth string';
-        is $req->header('Authorization'),'Basic ' . encode_base64($auth,''),'Got correcy encoded auth header';
+        is $req->header('Authorization'),'Basic ' . encode_base64($auth,''),'Got correct encoded auth header';
 
         return HTTP::Response->new( 200, 'OK', undef,
             $json->encode( { success => 'this is working' } ) );

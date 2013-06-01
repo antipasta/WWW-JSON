@@ -131,8 +131,7 @@ WWW::JSON - Make working with JSON Web API's as painless as possible
     use WWW::JSON;
     
     my $wj = WWW::JSON->new(
-        base_url    => 'https://graph.facebook.com',
-        body_params => { access_token => 'XXXXX' }
+        base_url    => 'https://graph.facebook.com?access_token=XXXX',
     );
     my $r = $wj->get('/me', { fields => 'email' } );
     my $email = $r->res->{email} if ($r->success);
@@ -143,7 +142,7 @@ WWW::JSON is an easy interface to any modern web API that returns JSON.
 
 It tries to make working with these API's as intuitive as possible.
 
-=head1 WHY SHOULD I CARE?
+=head1 ABSTRACT
 
 When using abstracted web API libraries I often ran into issues where bugs in the library interfere with proper api interactions, or features  are added to the API that the library doesn't support.
 
@@ -159,7 +158,7 @@ I wanted just enough abstraction to get the above benefits, but no more.
 
 Thus, WWW::JSON was born. Perl + Web + JSON - tears
 
-=head1 WHAT YOU GET
+=head2 WHAT YOU GET
 
 -Light on dependencies
 
