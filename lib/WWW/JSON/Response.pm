@@ -27,7 +27,7 @@ sub _build_response {
         my $decoded =
           $self->json->decode( $self->http_response->decoded_content );
         if ( $self->http_response->is_success ) {
-            $decoded = $self->response_transform->($decoded)
+            $decoded = $self->response_transform->($decoded,$self)
               if ( defined( $self->response_transform ) );
             $self->_set_success(1);
         }

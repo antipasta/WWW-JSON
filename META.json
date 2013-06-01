@@ -4,7 +4,7 @@
       "Joe Papperello <antipasta@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v0.4.4, CPAN::Meta::Converter version 2.130880",
+   "generated_by" : "Minilla/v0.4.6, CPAN::Meta::Converter version 2.130880",
    "license" : [
       "perl_5"
    ],
@@ -74,6 +74,7 @@
    },
    "version" : "0.01",
    "x_contributors" : [
-      "Joe Papperello <joe@socialflow.com>"
+      "Joe Papperello <joe@socialflow.com>",
+      "Joe Papperello <joeyis@gmail.com>"
    ]
 }
