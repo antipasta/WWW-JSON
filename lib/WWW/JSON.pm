@@ -1,5 +1,5 @@
 package WWW::JSON;
-use 5.008005;
+use 5.010;
 use strict;
 use warnings;
 
