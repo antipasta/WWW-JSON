@@ -217,13 +217,6 @@ Then in your responses you can get at key1 directly by just doing $res->{key1}
 
 NOTE: This transform only occurs if no HTTP errors or decoding errors occurred. If we get back an HTTP error status it seems more useful to get back the entire decoded JSON blob
 
-
-=head2 authorization_basic
-
-Accepts a hashref of basic HTTP auth credentials in the format { username => 'antipasta', password => 'hunter2' }
-
-Every request made by WWW::JSON will use these credentials.
-
 =head2 authentication
 
 Accepts a single key value pair, where the key is the name of a WWW::JSON::Role::Authentication role and the value is a hashref containing the data the role needs to perform the authentication.
