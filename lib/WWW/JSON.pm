@@ -23,8 +23,6 @@ has base_url => (
     coerce => sub {
         my $base_url = shift;
         my $u;
-
-        #return $base_url if ( $base_url->$_isa('URI') );
         if ( ref($base_url) eq 'ARRAY' ) {
             my ( $url, $params ) = @{$base_url};
             $u = URI->new($url);
@@ -121,7 +119,7 @@ sub _make_request {
     return WWW::JSON::Response->new(
         {
             http_response      => $resp,
-            response_transform => $self->default_response_transform
+            _response_transform => $self->default_response_transform
         }
     );
 }
@@ -273,6 +271,13 @@ $wj->put($path,$params)
 
 Performs a PUT request. $params is a hashref of parameters to be passed to the post body
 
+
+=head2 delete
+
+$wj->delete($path,$params)
+
+Performs a DELETE request. $params is a hashref of parameters to be passed to the post body
+
 =head2 req
 
 $wj->req($method,$path,$params)
@@ -296,6 +301,8 @@ it under the same terms as Perl itself.
 Joe Papperello E<lt>antipasta@cpan.orgE<gt>
 
 =head1 SEE ALSO
+
+-Net::OAuth2 - For making OAuth2 signed requests with WWW::JSON
 
 -App::Adenosine - Using this on the command line definitely served as some inspiration for WWW::JSON.
 

@@ -11,7 +11,7 @@ has http_response => (
 );
 has json => ( is => 'lazy', default => sub { JSON::XS->new } );
 has success => ( is => 'lazy', writer => '_set_success' );
-has response_transform => ( is => 'ro' );
+has _response_transform => ( is => 'ro' );
 has response => ( is => 'lazy', builder => '_build_response' );
 
 sub _build_success {
@@ -27,8 +27,8 @@ sub _build_response {
         my $decoded =
           $self->json->decode( $self->http_response->decoded_content );
         if ( $self->http_response->is_success ) {
-            $decoded = $self->response_transform->($decoded,$self)
-              if ( defined( $self->response_transform ) );
+            $decoded = $self->_response_transform->($decoded,$self)
+              if ( defined( $self->_response_transform ) );
             $self->_set_success(1);
         }
         return $decoded;
@@ -59,7 +59,13 @@ WWW::JSON::Response - Response objects returned by WWW::JSON requests
         base_params => { access_token => 'XXXXX' }
     );
     my $r = $wj->get('/me', { fields => 'email' } );
-    my $email = $r->res->{email} if ($r->success);
+    if ($r->success) {
+        print $r->res->{email} . "\n";
+    } else {
+        print "HTTP ERROR CODE " . $r->code . "\n";
+        print "HTTP STATUS " . $r->status_line . "\n";
+    }
+
 
 =head1 DESCRIPTION
 

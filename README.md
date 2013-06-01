@@ -83,6 +83,16 @@ base\_url => \[ 'http://google.com', { key1 => 'val1', key2 => 'val2'} \]
 
 Parameters that will be added to every non-GET request made by WWW::JSON.
 
+## post\_body\_format
+
+How to serialize the post body.
+
+'serialized' - Normal post body serialization (this is the default)
+
+'JSON' - JSONify the post body. Used by API's like github and google plus
+
+
+
 ## default\_response\_transform
 
 Many API's have a lot of boilerplate around their json responses.
@@ -134,6 +144,14 @@ $wj->put($path,$params)
 
 Performs a PUT request. $params is a hashref of parameters to be passed to the post body
 
+
+
+## delete
+
+$wj->delete($path,$params)
+
+Performs a DELETE request. $params is a hashref of parameters to be passed to the post body
+
 ## req
 
 $wj->req($method,$path,$params)
@@ -158,6 +176,8 @@ it under the same terms as Perl itself.
 Joe Papperello <antipasta@cpan.org>
 
 # SEE ALSO
+
+\-Net::OAuth2 - For making OAuth2 signed requests with WWW::JSON
 
 \-App::Adenosine - Using this on the command line definitely served as some inspiration for WWW::JSON.
 
