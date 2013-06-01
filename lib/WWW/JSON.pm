@@ -15,21 +15,30 @@ use JSON::XS;
 
 has ua => (
     is      => 'lazy',
-    handles => [qw/timeout/],
+    handles => [qw/timeout default_header/],
     default => sub { LWP::UserAgent->new }
 );
 has base_url => (
     is     => 'rw',
     coerce => sub {
         my $base_url = shift;
-        return $base_url if ( $base_url->$_isa('URI') );
+        my $u;
+
+        #return $base_url if ( $base_url->$_isa('URI') );
         if ( ref($base_url) eq 'ARRAY' ) {
             my ( $url, $params ) = @{$base_url};
-            my $u = URI->new($url);
+            $u = URI->new($url);
             $u->query_form(%$params);
-            return $u;
+        } else {
+            $u = URI->new($base_url);
         }
-        return URI->new($base_url);
+        if ( my $path = $u->path ) {
+            unless ( $path =~ m|/$| ) {
+                $path =~ s|$|/|;
+                $u->path($path);
+            }
+        }
+        return $u;
     }
 );
 has body_params => ( is => 'rw', default => sub { +{} } );
@@ -203,6 +212,15 @@ base_url => [ 'http://google.com', { key1 => 'val1', key2 => 'val2'} ]
 =head2 body_params
 
 Parameters that will be added to every non-GET request made by WWW::JSON.
+
+=head2 post_body_format
+
+How to serialize the post body.
+
+'serialized' - Normal post body serialization (this is the default)
+
+'JSON' - JSONify the post body. Used by API's like github and google plus
+
 
 =head2 default_response_transform
 
