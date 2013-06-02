@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "y";
+our $VERSION = "0.02";
 use LWP::UserAgent;
 use Moo;
 use Try::Tiny;
