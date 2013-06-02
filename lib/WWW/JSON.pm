@@ -9,7 +9,6 @@ use Moo;
 use Try::Tiny;
 use URI;
 use WWW::JSON::Response;
-use Data::Dumper::Concise;
 use Safe::Isa;
 use JSON::XS;
 

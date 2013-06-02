@@ -1,6 +1,5 @@
 package WWW::JSON::Role::Authentication;
 use Moo::Role;
-use Data::Dumper::Concise;
 has authentication => (
     is      => 'rw',
     lazy => 1,

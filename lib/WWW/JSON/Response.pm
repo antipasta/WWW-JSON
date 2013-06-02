@@ -2,7 +2,6 @@ package WWW::JSON::Response;
 use Moo;
 use JSON::XS;
 use Try::Tiny;
-use Data::Dumper::Concise;
 
 has http_response => (
     is       => 'ro',
