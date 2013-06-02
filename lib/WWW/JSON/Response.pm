@@ -51,6 +51,7 @@ __END__
 WWW::JSON::Response - Response objects returned by WWW::JSON requests
 
 =head1 SYNOPSIS
+
     use WWW::JSON;
     
     my $wj = WWW::JSON->new(
