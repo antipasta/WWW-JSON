@@ -42,7 +42,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Data::Dumper::Concise" : "1.60",
             "JSON::XS" : "2.33",
             "LWP::UserAgent" : "0",
             "Moo" : "1.001",
@@ -50,7 +49,7 @@
             "Safe::Isa" : "1.000003",
             "Try::Tiny" : "0.12",
             "URI" : "0",
-            "perl" : "5.010"
+            "perl" : "5.008005"
          }
       },
       "test" : {

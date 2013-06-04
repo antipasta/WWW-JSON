@@ -6,7 +6,13 @@ use Try::Tiny;
 has http_response => (
     is       => 'ro',
     required => 1,
-    handles  => [qw/status_line decoded_content code/],
+
+    handles => {
+        status_line     => 'status_line',
+        code            => 'code',
+        url             => 'base',
+        content         => 'decoded_content',
+    },
 );
 has json => ( is => 'lazy', default => sub { JSON::XS->new } );
 has success => ( is => 'lazy', writer => '_set_success' );
@@ -99,9 +105,13 @@ HTTP code returned by this request
 
 HTTP status_line code returned by this request
 
-=head2 decoded_content
+=head2 content
 
 The HTTP response's non json-decoded content
+
+=head2 url
+
+The url of this request
 
 =head2 http_response
 

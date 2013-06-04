@@ -46,7 +46,7 @@ is $fail->code    => 200, 'HTTP code 200';
 diag "Ignore the following warning, it is expected for this test";
 is $fail->success => 0,   'JSON parse failed';
 ok !defined( $fail->res ), 'No decoded json response';
-is $fail->decoded_content => 'THIS IS NOT JSON';
+is $fail->content => 'THIS IS NOT JSON';
 
 ok my $req_non_base =
   $wj->post( 'http://some_alt_url/something', { param => 456 } );
