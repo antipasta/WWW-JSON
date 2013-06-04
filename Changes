@@ -1,6 +1,8 @@
 Revision history for Perl extension WWW-JSON
 
 {{$NEXT}}
+    - 5.08 support, since it was trivial to implement
+    - Added www-json-response->handle
 
 0.02 2013-06-02T00:51:24Z
 
