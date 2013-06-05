@@ -136,12 +136,22 @@ WWW::JSON - Make working with JSON Web API's as painless as possible
 =head1 SYNOPSIS
 
     use WWW::JSON;
-    
+
     my $wj = WWW::JSON->new(
-        base_url    => 'https://graph.facebook.com?access_token=XXXX',
+        base_url => 'http://api.metacpan.org/v0?fields=name,distribution&size=1',
+        post_body_format           => 'JSON',
+        default_response_transform => sub { shift->{hits}{hits}[0]{fields} },
     );
-    my $r = $wj->get('/me', { fields => 'email' } );
-    my $email = $r->res->{email} if ($r->success);
+
+    my $get = $wj->get(
+        '/release/_search',
+        {
+            q      => 'author:ANTIPASTA',
+            filter => 'status:latest',
+        }
+    );
+
+    warn "DISTRIBUTION: " . $get->res->{distribution} if $get->success;
 
 =head1 DESCRIPTION
 
