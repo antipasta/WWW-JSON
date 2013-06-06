@@ -60,7 +60,7 @@ has default_response_transform => (
     }
 );
 
-has ua_options => ( is => 'ro');
+has ua_options => ( is => 'lazy', default => sub { +{} });
 
 with 'WWW::JSON::Role::Authentication';
 my %METHOD_DISPATCH = (

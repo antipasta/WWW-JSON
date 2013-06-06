@@ -16,12 +16,12 @@ my $get = $wj->get(
         filter => 'status:latest',
     }
 );
+if ($get->success) {
+    warn "DISTRIBUTION: " . $get->res->{distribution} ;
+} else {
+    warn $get->error;
+}
 
-warn "DISTRIBUTION: " . $get->res->{distribution} if $get->success;
-
-warn "Status is " . $get->status_line;
-warn "Request URL is " . $get->url;
-warn "Content is " . Dumper( $get->res );
 
 my $post = $wj->post(
     '/release/_search',
@@ -35,6 +35,7 @@ my $post = $wj->post(
         size => 1
     }
 );
+warn "DISTRIBUTION: " . $get->res->{distribution} unless $get->success;
 warn "Status is " . $post->status_line;
 warn "Request URL is " . $post->url;
 warn "Content is " . Dumper( $post->res );
