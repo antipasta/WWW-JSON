@@ -128,14 +128,17 @@ sub _create_request_obj {
 }
 
 sub _make_request {
-    my ( $self, $method, $uri, $p) = @_;
-    my $request_obj = $self->_create_request_obj($method,$uri,$p);
-    my $resp = $self->ua->request( $request_obj);
+    my ( $self, $method, $uri, $p ) = @_;
+    my $request_obj = $self->_create_request_obj( $method, $uri, $p );
+    my $resp = $self->ua->request($request_obj);
 
     return WWW::JSON::Response->new(
         {
             http_response       => $resp,
-            _response_transform => $self->default_response_transform
+            _response_transform => $self->default_response_transform,
+            json                => $self->json,
+            _request_params     => [ $method, $uri, $p ],
+            _parent             => $self,
         }
     );
 }
