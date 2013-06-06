@@ -14,7 +14,7 @@ sub _validate_OAuth1 {
 }
 
 sub _auth_OAuth1 {
-    my ( $self, $auth, $method, $uri, $params ) = @_;
+    my ( $self, $auth, $req, $method, $uri, $params ) = @_;
 
     my $request = Net::OAuth->request("protected resource")->new(
         %$auth,
@@ -27,8 +27,7 @@ sub _auth_OAuth1 {
     );
     $request->sign;
     $request->to_authorization_header;
-    $self->ua->default_header(
-        Authorization => $request->to_authorization_header );
+    $req->header( Authorization => $request->to_authorization_header );
 }
 
 sub _nonce {

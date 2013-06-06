@@ -13,9 +13,8 @@ sub _validate_OAuth2 {
 }
 
 sub _auth_OAuth2 {
-    my ( $self, $auth ) = @_;
-    $self->ua->default_header(
-        Authorization => 'Bearer ' . $auth->access_token );
+    my ( $self, $auth, $req ) = @_;
+    $req->header( Authorization => 'Bearer ' . $auth->access_token );
 }
 
 1;

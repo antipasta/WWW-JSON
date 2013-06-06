@@ -33,28 +33,17 @@ sub _trigger_authentication {
     $self->$validator($data) if ( $self->can($validator) );
 }
 
-before clear_authentication => sub {
-    my $self = shift;
-    $self->ua->default_headers->remove_header('Authorization')
-      if ( $self->authentication );
-};
-
-around _make_request => sub {
+around _create_request_obj => sub {
     my ( $orig, $self ) = ( shift, shift );
+    my $request = $self->$orig(@_);
     if ( ref( $self->authentication ) eq 'CODE' ) {
         $self->authentication->( $self, @_ );
     }
     elsif ( my ( $auth_type, $auth ) = %{ $self->authentication } ) {
         my $handler   = '_auth_' . $auth_type;
-        $self->$handler( $auth, @_ );
+        $self->$handler( $auth, $request, @_ );
     }
-    return $self->$orig(@_);
-};
-
-after _make_request => sub {
-    my $self = shift;
-    $self->ua->default_headers->remove_header('Authorization')
-      if ( $self->authentication );
+    return $request;
 };
 
 with qw/WWW::JSON::Role::Authentication::Basic
