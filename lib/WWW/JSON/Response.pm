@@ -15,15 +15,17 @@ has http_response => (
     },
 );
 has json => ( is => 'lazy', default => sub { JSON::XS->new } );
-has success => ( is => 'lazy', writer => '_set_success' );
 has _response_transform => ( is => 'ro' );
 has response => ( is => 'lazy', builder => '_build_response' );
+has error => ( is => 'lazy', writer => '_set_error' );
 
-sub _build_success {
+sub success { !shift->error }
+
+sub _build_error {
     my $self = shift;
-    $self->_set_success(0);
+    $self->_set_error('');
     $self->response;
-    return $self->success;
+    return $self->error;
 }
 
 sub _build_response {
@@ -34,12 +36,16 @@ sub _build_response {
         if ( $self->http_response->is_success ) {
             $decoded = $self->_response_transform->($decoded,$self)
               if ( defined( $self->_response_transform ) );
-            $self->_set_success(1);
+        } else { 
+            $self->_set_error($self->status_line);
         }
         return $decoded;
     }
     catch {
-        warn "Error decoding json [$_]";
+        $self->_set_error( "Error decoding json [$_], HTTP status ["
+              . $self->status_line
+              . "]" );
+        warn $self->error;
         return;
     };
 }
@@ -66,10 +72,9 @@ WWW::JSON::Response - Response objects returned by WWW::JSON requests
     );
     my $r = $wj->get('/me', { fields => 'email' } );
     if ($r->success) {
-        print $r->res->{email} . "\n";
+        say $r->res->{email};
     } else {
-        print "HTTP ERROR CODE " . $r->code . "\n";
-        print "HTTP STATUS " . $r->status_line . "\n";
+        say $r->error;
     }
 
 
@@ -87,7 +92,10 @@ An HTTP::Response object containing json
 
 =head2 success
 
-1 if both the http request returned successfully (HTTP 200 OK) AND the json was successfully decoded. 0 if either of those things went badly.
+True if both the http request returned successfully (HTTP 200 OK) AND the json was successfully decoded. False if either of those things went horribly wrong.
+
+=head2 error
+If the http request failed then this is the contents of HTTP::Response->status_line. If the json parse failed it is a combination of the error encountered during JSON parse and the http status line
 
 =head2 response
 
