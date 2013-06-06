@@ -1,4 +1,6 @@
 package WWW::JSON::Response;
+use strict;
+use warnings;
 use Moo;
 use JSON::XS;
 use Try::Tiny;
@@ -8,16 +10,16 @@ has http_response => (
     required => 1,
 
     handles => {
-        status_line     => 'status_line',
-        code            => 'code',
-        url             => 'base',
-        content         => 'decoded_content',
+        status_line => 'status_line',
+        code        => 'code',
+        url         => 'base',
+        content     => 'decoded_content',
     },
 );
 has json => ( is => 'lazy', default => sub { JSON::XS->new } );
 has _response_transform => ( is => 'ro' );
-has response => ( is => 'lazy', builder => '_build_response' );
-has error => ( is => 'lazy', writer => '_set_error' );
+has response            => ( is => 'lazy', builder => '_build_response' );
+has error               => ( is => 'lazy', writer => '_set_error' );
 
 sub success { !shift->error }
 
@@ -30,24 +32,22 @@ sub _build_error {
 
 sub _build_response {
     my $self = shift;
-    return try {
-        my $decoded =
-          $self->json->decode( $self->http_response->decoded_content );
-        if ( $self->http_response->is_success ) {
-            $decoded = $self->_response_transform->($decoded,$self)
-              if ( defined( $self->_response_transform ) );
-        } else { 
-            $self->_set_error($self->status_line);
-        }
-        return $decoded;
+
+    $self->_set_error( $self->status_line )
+      unless ( $self->http_response->is_success );
+
+    my $decoded = try {
+        $self->json->decode( $self->http_response->decoded_content );
     }
     catch {
-        $self->_set_error( "Error decoding json [$_], HTTP status ["
-              . $self->status_line
-              . "]" );
-        warn $self->error;
+        $self->_set_error("$_") unless ( $self->error );
         return;
     };
+
+    if ( !( $self->error ) && $self->_response_transform ) {
+        $decoded = $self->_response_transform->($decoded);
+    }
+    return $decoded;
 }
 
 sub res { shift->response }

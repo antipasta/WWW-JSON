@@ -15,7 +15,7 @@ use JSON::XS;
 has ua => (
     is      => 'lazy',
     handles => [qw/timeout default_header/],
-    default => sub { LWP::UserAgent->new }
+    default => sub { LWP::UserAgent->new(%{$_[0]->lwp_options}) }
 );
 has base_url => (
     is     => 'rw',
@@ -58,6 +58,8 @@ has default_response_transform => (
           unless ref( $_[0] ) eq 'CODE';
     }
 );
+
+has lwp_options => ( is => 'ro');
 
 with 'WWW::JSON::Role::Authentication';
 sub get    { shift->req( 'GET',    @_ ) }
