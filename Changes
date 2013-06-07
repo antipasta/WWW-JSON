@@ -6,6 +6,7 @@ Revision history for Perl extension WWW-JSON
     - Create HTTP::Response objects instead of using lwp->get, ->post etc
     - Refactored how auth roles work, no more using lwp->default_header('Authorization') nonsense
     - Added a simple example using the metacpan api
+    - Can pass arbitrary options to useragent via ua_options
 
 0.03 2013-06-04T04:26:03Z
     - 5.08 support, since it was trivial to implement

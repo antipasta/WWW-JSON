@@ -72,14 +72,23 @@ WWW::JSON::Response - Response objects returned by WWW::JSON requests
 =head1 SYNOPSIS
 
     use WWW::JSON;
-    
+
     my $wj = WWW::JSON->new(
-        base_url    => 'https://graph.facebook.com',
-        base_params => { access_token => 'XXXXX' }
+        base_url => 'http://api.metacpan.org/v0?fields=name,distribution&size=1',
+        post_body_format           => 'JSON',
+        default_response_transform => sub { shift->{hits}{hits}[0]{fields} },
     );
-    my $r = $wj->get('/me', { fields => 'email' } );
-    if ($r->success) {
-        say $r->res->{email};
+
+    my $get = $wj->get(
+        '/release/_search',
+        {
+            q      => 'author:ANTIPASTA',
+            filter => 'status:latest',
+        }
+    );
+
+    if ($get->success) {
+        say $r->res->{distribution};
     } else {
         say $r->error;
     }

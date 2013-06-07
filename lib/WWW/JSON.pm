@@ -281,6 +281,10 @@ OAuth2 => Net::OAuth2::AccessToken->new( ... )
 
 New roles can be created to support different types of authentication. Documentation on this will be fleshed out at a later time.
 
+=head2 ua_options
+
+Options that can be passed when initializing the useragent. For example { timeout => 5 }. See LWP::UserAgent for possibilities.
+
 =head1 METHODS
 
 =head2 get
