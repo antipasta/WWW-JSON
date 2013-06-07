@@ -43,7 +43,6 @@ is $get->code => 200, 'Got 200 OK';
 ok $get->res->{success} eq 'this is working';
 
 ok my $get_404 = $wj->get('/404');
-diag "Ignore the following warning, it is expected for this test";
 isnt $get_404->success,   'Got no success';
 is $get_404->code    => 404, 'Got code 404';
 

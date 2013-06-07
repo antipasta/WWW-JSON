@@ -43,7 +43,6 @@ ok my $wj = WWW::JSON->new( ua => $fake_ua, base_url => 'http://localhost' );
 ok my $fail = $wj->post('/failed_json_parse');
 ok $fail->http_response->is_success, 'HTTP request success';
 is $fail->code    => 200, 'HTTP code 200';
-diag "Ignore the following warning, it is expected for this test";
 isnt $fail->success,   'JSON parse failed';
 ok $fail->error,   'Got json parse error';
 ok !defined( $fail->res ), 'No decoded json response';
