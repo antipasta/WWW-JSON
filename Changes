@@ -1,6 +1,8 @@
 Revision history for Perl extension WWW-JSON
 
 {{$NEXT}}
+
+0.04 2013-06-07T16:35:53Z
     - Added response->error 
     - Experimental ability for a response to retry itself via resp->retry(), still thinking this through so it's not in the perldoc yet
     - Create HTTP::Response objects instead of using lwp->get, ->post etc
