@@ -67,7 +67,8 @@ my %METHOD_DISPATCH = (
     GET    => \&HTTP::Request::Common::GET,
     POST   => \&HTTP::Request::Common::POST,
     PUT    => \&HTTP::Request::Common::PUT,
-    DELETE => \&HTTP::Request::Common::DELETE
+    DELETE => \&HTTP::Request::Common::DELETE,
+    HEAD   => \&HTTP::Request::Common::HEAD
 );
 
 sub get    { shift->req( 'GET',    @_ ) }
