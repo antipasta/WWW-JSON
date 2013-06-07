@@ -2,9 +2,9 @@ Revision history for Perl extension WWW-JSON
 
 {{$NEXT}}
     - Added response->error 
+    - Added ability for a response to retry itself via resp->retry()
     - Create HTTP::Response objects instead of using lwp->get, ->post etc
     - Refactored how auth roles work, no more using lwp->default_header('Authorization') nonsense
-    - Added ability for a response to retry itself
     - Added a simple example using the metacpan api
 
 0.03 2013-06-04T04:26:03Z
