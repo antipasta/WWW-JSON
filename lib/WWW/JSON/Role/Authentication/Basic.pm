@@ -1,7 +1,6 @@
 package WWW::JSON::Role::Authentication::Basic;
 use Moo::Role;
 use MIME::Base64;
-use Data::Dumper::Concise;
 requires 'authentication';
 requires 'ua';
 
