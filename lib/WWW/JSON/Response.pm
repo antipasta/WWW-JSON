@@ -2,7 +2,7 @@ package WWW::JSON::Response;
 use strict;
 use warnings;
 use Moo;
-use JSON::Any;
+use JSON;
 use Try::Tiny;
 
 has http_response => (
@@ -16,7 +16,7 @@ has http_response => (
         content     => 'decoded_content',
     },
 );
-has json => ( is => 'lazy', default => sub { JSON::Any->new } );
+has json => ( is => 'lazy', default => sub { JSON->new } );
 has response            => ( is => 'lazy', builder => '_build_response' );
 has error               => ( is => 'lazy', writer => '_set_error' );
 has _request_params     => ( is => 'ro' );

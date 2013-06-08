@@ -10,7 +10,7 @@ use Try::Tiny;
 use URI;
 use WWW::JSON::Response;
 use Safe::Isa;
-use JSON::Any;
+use JSON;
 use HTTP::Request::Common;
 use Data::Dumper::Concise;
 use WWW::JSON::HTTPResponse;
@@ -52,7 +52,7 @@ has post_body_format => (
           unless ( $_[0] eq 'serialized' || $_[0] eq 'JSON' );
     }
 );
-has json => ( is => 'ro', default => sub { JSON::Any->new } );
+has json => ( is => 'ro', default => sub { JSON->new } );
 
 has default_response_transform => (
     is      => 'rw',
@@ -142,7 +142,15 @@ sub _http_req {
     my ( $self, $req ) = @_;
     my $resp;
     if ( $self->ua->$_isa('HTTP::Tiny') ) {
-        my @params = ( $req->method, $req->url, { content => $req->content } );
+        my %headers = map { $_ => $req->header($_) } $req->headers->header_field_names;
+        my @params = (
+            $req->method,
+            $req->url,
+            {
+                content => $req->content,
+                (%headers) ? ( headers => \%headers ) : ()
+            }
+        );
         $resp = $self->ua->request(@params);
         $resp = WWW::JSON::HTTPResponse->new(%$resp);
     }
