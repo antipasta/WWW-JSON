@@ -13,6 +13,7 @@ on 'runtime' => sub {
     requires 'Net::OAuth', '0.28';
     requires 'Safe::Isa', '1.000003';
     requires 'HTTP::Tiny', '0.029';
+    requires 'Module::Runtime', '0.013';
     recommends 'LWP::UserAgent', '0';
     recommends 'JSON::XS', '2.34';
 };
