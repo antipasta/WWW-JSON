@@ -12,14 +12,13 @@ use Safe::Isa;
 use JSON;
 use HTTP::Request::Common;
 use Data::Dumper::Concise;
-use WWW::JSON::HTTPResponse;
 use Module::Runtime qw( require_module );
 has ua => (
-    is => 'lazy',
+    is      => 'lazy',
     handles => {
         timeout        => 'timeout',
         default_header => 'default_header',
-        ua_request        => 'request'
+        ua_request     => 'request'
     },
     builder => '_build_ua'
 );
@@ -32,7 +31,8 @@ has base_url => (
             my ( $url, $params ) = @{$base_url};
             $u = URI->new($url);
             $u->query_form(%$params);
-        } else {
+        }
+        else {
             $u = URI->new($base_url);
         }
         if ( my $path = $u->path ) {
@@ -65,10 +65,11 @@ has default_response_transform => (
     }
 );
 
-has ua_options => ( is => 'lazy', default => sub { +{} });
-has ua_class => ( is => 'lazy', default => sub { 'HTTP::Tiny' });
+has ua_options => ( is => 'lazy', default => sub { +{} } );
+has ua_class   => ( is => 'lazy', default => sub { 'HTTP::Tiny' } );
 
-with qw/WWW::JSON::Role::Authentication WWW::JSON::Role::HTTP::Tiny/;
+with qw/WWW::JSON::Role::Authentication
+  WWW::JSON::Role::HTTP::Tiny/;
 my %METHOD_DISPATCH = (
     GET    => \&HTTP::Request::Common::GET,
     POST   => \&HTTP::Request::Common::POST,
@@ -84,14 +85,14 @@ sub delete { shift->req( 'DELETE', @_ ) }
 sub head   { shift->req( 'HEAD',   @_ ) }
 
 sub _build_ua {
-    my $self = shift;
+    my $self  = shift;
     my $class = $self->ua_class;
     require_module($class) or die "$class not found";
-    $class->new(%{$self->ua_options});
+    $class->new( %{ $self->ua_options } );
 }
 
 sub req {
-    my ( $self, $method, $path, $params) = @_;
+    my ( $self, $method, $path, $params ) = @_;
     $params = {} unless defined($params);
     unless ( $path->$_isa('URI') ) {
         $path =~ s|^/|./|;
@@ -105,7 +106,7 @@ sub req {
       ( $path->scheme ) ? $path : URI->new_abs( $path, $self->base_url );
     $abs_uri->query_form( $path->query_form, $self->base_url->query_form );
 
-    return $self->_make_request( $method, $abs_uri, $p);
+    return $self->_make_request( $method, $abs_uri, $p );
 }
 
 sub body_param {
@@ -125,7 +126,7 @@ sub _create_post_body {
 }
 
 sub _create_request_obj {
-    my ( $self, $method, $uri, $p) = @_;
+    my ( $self, $method, $uri, $p ) = @_;
     my $dispatch = $METHOD_DISPATCH{$method}
       or die "Method $method not implemented";
 

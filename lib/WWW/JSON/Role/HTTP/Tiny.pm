@@ -2,6 +2,7 @@ package WWW::JSON::Role::HTTP::Tiny;
 use HTTP::Tiny;
 use Moo::Role;
 use Safe::Isa;
+use WWW::JSON::HTTPTinyResponse;
 
 around 'ua_request' => sub {
     my ( $orig, $self ) = ( shift, shift );
@@ -18,7 +19,7 @@ around 'ua_request' => sub {
             (%headers) ? ( headers => \%headers ) : ()
         }
     );
-    return WWW::JSON::HTTPResponse->new( %{ $self->$orig(@params) } );
+    return WWW::JSON::HTTPTinyResponse->new( %{ $self->$orig(@params) } );
 };
 
 1;
