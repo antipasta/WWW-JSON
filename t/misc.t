@@ -4,11 +4,10 @@ use Test::More;
 use Test::Mock::LWP::Dispatch;
 use HTTP::Response;
 use WWW::JSON;
-use JSON::XS;
+use JSON;
 
-my $json    = JSON::XS->new;
-my $fake_ua = LWP::UserAgent->new;
-$fake_ua->map(
+my $json    = JSON->new;
+$mock_ua->map(
     'http://some_alt_url/something',
     sub {
         my $req = shift;
@@ -19,7 +18,7 @@ $fake_ua->map(
     }
 );
 
-$fake_ua->map(
+$mock_ua->map(
     'http://localhost/failed_json_parse',
     sub {
         my $req = shift;
@@ -27,7 +26,7 @@ $fake_ua->map(
     }
 );
 
-$fake_ua->map(
+$mock_ua->map(
     'http://localhost/test/transform',
     sub {
         my $req = shift;
@@ -37,7 +36,7 @@ $fake_ua->map(
             $json->encode( { data => { result => [ 'item 1', 'item 2' ] } } ) );
     }
 );
-ok my $wj = WWW::JSON->new( ua => $fake_ua, base_url => 'http://localhost' );
+ok my $wj = WWW::JSON->new( ua => $mock_ua, base_url => 'http://localhost' );
 
 
 ok my $fail = $wj->post('/failed_json_parse');

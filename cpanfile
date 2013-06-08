@@ -6,12 +6,14 @@ on 'test' => sub {
 };
 
 on 'runtime' => sub {
-    requires 'JSON::XS', '2.33';
-    requires 'LWP::UserAgent', '0';
+    requires 'JSON', '2.59';
     requires 'Moo', '1.001';
     requires 'Try::Tiny', '0.12';
     requires 'URI', '0';
     requires 'Net::OAuth', '0.28';
     requires 'Safe::Isa', '1.000003';
+    requires 'HTTP::Tiny', '0.029';
+    recommends 'LWP::UserAgent', '0';
+    recommends 'JSON::XS', '2.34';
 };
 

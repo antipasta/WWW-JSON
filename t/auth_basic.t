@@ -4,14 +4,13 @@ use Test::More;
 use Test::Mock::LWP::Dispatch;
 use HTTP::Response;
 use WWW::JSON;
-use JSON::XS;
+use JSON;
 use URI;
 use URI::QueryParam;
 use MIME::Base64;
 
 my $json    = JSON::XS->new;
-my $fake_ua = LWP::UserAgent->new;
-$fake_ua->map(
+$mock_ua->map(
     'http://localhost/get/request',
     sub {
         my $req = shift;
@@ -25,7 +24,7 @@ $fake_ua->map(
 );
 
 ok my $wj = WWW::JSON->new(
-    ua       => $fake_ua,
+    ua       => $mock_ua,
     base_url => 'http://localhost',
     authentication => { Basic => { username => 'antipasta', password => 'hunter2'}},
 );

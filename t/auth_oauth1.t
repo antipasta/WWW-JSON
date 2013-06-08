@@ -4,10 +4,9 @@ use Test::More;
 use Test::Mock::LWP::Dispatch;
 use HTTP::Response;
 use WWW::JSON;
-use JSON::XS;
+use JSON;
 use URI;
 use URI::QueryParam;
-use MIME::Base64;
 use Net::OAuth;
 my $oauth_creds = {
     consumer_key    => 'consumer',
@@ -16,9 +15,8 @@ my $oauth_creds = {
     token_secret    => 'tokensecret'
 };
 
-my $json    = JSON::XS->new;
-my $fake_ua = LWP::UserAgent->new;
-$fake_ua->map(
+my $json    = JSON->new;
+$mock_ua->map(
     'http://localhost/get/request?abc=123',
     sub {
         my $req = shift;
@@ -37,7 +35,7 @@ $fake_ua->map(
             $json->encode( { success => 'get request working' } ) );
     }
 );
-$fake_ua->map(
+$mock_ua->map(
     'http://localhost/post/request',
     sub {
         my $req = shift;
@@ -58,7 +56,7 @@ $fake_ua->map(
 );
 
 ok my $wj = WWW::JSON->new(
-    ua             => $fake_ua,
+    ua             => $mock_ua,
     base_url       => 'http://localhost/',
     authentication => {
         OAuth1 => $oauth_creds,

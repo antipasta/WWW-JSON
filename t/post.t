@@ -4,14 +4,13 @@ use Test::More;
 use Test::Mock::LWP::Dispatch;
 use HTTP::Response;
 use WWW::JSON;
-use JSON::XS;
+use JSON;
 use URI;
 use URI::QueryParam;
 
-my $json    = JSON::XS->new;
-my $fake_ua = LWP::UserAgent->new;
+my $json    = JSON->new;
 
-$fake_ua->map(
+$mock_ua->map(
     'http://localhost/post/request',
     sub {
         my $req = shift;
@@ -27,7 +26,7 @@ $fake_ua->map(
     }
 );
 
-$fake_ua->map(
+$mock_ua->map(
     'http://localhost/json_post_request',
     sub {
         my $req = shift;
@@ -42,7 +41,7 @@ $fake_ua->map(
             $json->encode( { success => 'JSON POST is working' } ) );
     }
 );
-ok my $wj = WWW::JSON->new( ua => $fake_ua, base_url => 'http://localhost' );
+ok my $wj = WWW::JSON->new( ua => $mock_ua, base_url => 'http://localhost' );
 
 ok my $post = $wj->post( '/post/request', { some_post_param => 'yes' } );
 ok $post->success, 'post successful';

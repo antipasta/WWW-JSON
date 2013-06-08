@@ -4,20 +4,19 @@ use Test::More;
 use Test::Mock::LWP::Dispatch;
 use HTTP::Response;
 use WWW::JSON;
-use JSON::XS;
+use JSON;
 use URI;
 use URI::QueryParam;
 
-my $json    = JSON::XS->new;
-my $fake_ua = LWP::UserAgent->new;
+my $json    = JSON->new;
 
-ok my $wj = WWW::JSON->new( ua => $fake_ua, base_url => 'http://localhost' );
+ok my $wj = WWW::JSON->new( ua => $mock_ua, base_url => 'http://localhost' );
 
 ok my $get_404 = $wj->get('/not_found');
 isnt $get_404->success,   'Got no success';
 is $get_404->code    => 404, 'Got code 404';
 
-$fake_ua->map(
+$mock_ua->map(
     'http://localhost/not_found',
     sub {
         my $req = shift;
