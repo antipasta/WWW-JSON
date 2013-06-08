@@ -41,9 +41,14 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "JSON::XS" : "2.34",
+            "LWP::UserAgent" : "0"
+         },
          "requires" : {
-            "JSON::XS" : "2.33",
-            "LWP::UserAgent" : "0",
+            "HTTP::Tiny" : "0.029",
+            "JSON" : "2.59",
+            "Module::Runtime" : "0.013",
             "Moo" : "1.001",
             "Net::OAuth" : "0.28",
             "Safe::Isa" : "1.000003",
