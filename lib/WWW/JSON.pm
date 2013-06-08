@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 our $VERSION = "0.04";
-use LWP::UserAgent;
 use Moo;
 use Try::Tiny;
 use URI;
@@ -14,11 +13,14 @@ use JSON;
 use HTTP::Request::Common;
 use Data::Dumper::Concise;
 use WWW::JSON::HTTPResponse;
-use HTTP::Tiny;
 use Module::Runtime qw( require_module );
 has ua => (
-    is      => 'lazy',
-    handles => [qw/timeout default_header/],
+    is => 'lazy',
+    handles => {
+        timeout        => 'timeout',
+        default_header => 'default_header',
+        ua_request        => 'request'
+    },
     builder => '_build_ua'
 );
 has base_url => (
@@ -66,7 +68,7 @@ has default_response_transform => (
 has ua_options => ( is => 'lazy', default => sub { +{} });
 has ua_class => ( is => 'lazy', default => sub { 'HTTP::Tiny' });
 
-with 'WWW::JSON::Role::Authentication';
+with qw/WWW::JSON::Role::Authentication WWW::JSON::Role::HTTP::Tiny/;
 my %METHOD_DISPATCH = (
     GET    => \&HTTP::Request::Common::GET,
     POST   => \&HTTP::Request::Common::POST,
@@ -138,32 +140,10 @@ sub _create_request_obj {
     return $dispatch->( $uri->as_string, %payload );
 }
 
-sub _http_req {
-    my ( $self, $req ) = @_;
-    my $resp;
-    if ( $self->ua->$_isa('HTTP::Tiny') ) {
-        my %headers = map { $_ => $req->header($_) } $req->headers->header_field_names;
-        my @params = (
-            $req->method,
-            $req->url,
-            {
-                content => $req->content,
-                (%headers) ? ( headers => \%headers ) : ()
-            }
-        );
-        $resp = $self->ua->request(@params);
-        $resp = WWW::JSON::HTTPResponse->new(%$resp);
-    }
-    else {
-        $resp = $self->ua->request($req);
-    }
-    return $resp;
-}
-
 sub _make_request {
     my ( $self, $method, $uri, $p ) = @_;
     my $request_obj = $self->_create_request_obj( $method, $uri, $p );
-    my $resp = $self->_http_req($request_obj);
+    my $resp = $self->ua_request($request_obj);
 
     return WWW::JSON::Response->new(
         {
