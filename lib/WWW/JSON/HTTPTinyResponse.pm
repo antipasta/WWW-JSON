@@ -1,4 +1,4 @@
-package WWW::JSON::HTTPResponse;
+package WWW::JSON::HTTPTinyResponse;
 use strict;
 use warnings;
 use Moo;

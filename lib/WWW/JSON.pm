@@ -11,7 +11,6 @@ use WWW::JSON::Response;
 use Safe::Isa;
 use JSON;
 use HTTP::Request::Common;
-use Data::Dumper::Concise;
 use Module::Runtime qw( require_module );
 has ua => (
     is      => 'lazy',
