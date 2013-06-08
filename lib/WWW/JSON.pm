@@ -10,13 +10,16 @@ use Try::Tiny;
 use URI;
 use WWW::JSON::Response;
 use Safe::Isa;
-use JSON::XS;
+use JSON::Any;
 use HTTP::Request::Common;
-
+use Data::Dumper::Concise;
+use WWW::JSON::HTTPResponse;
+use HTTP::Tiny;
+use Module::Runtime qw( require_module );
 has ua => (
     is      => 'lazy',
     handles => [qw/timeout default_header/],
-    default => sub { LWP::UserAgent->new(%{$_[0]->ua_options}) }
+    builder => '_build_ua'
 );
 has base_url => (
     is     => 'rw',
@@ -49,7 +52,7 @@ has post_body_format => (
           unless ( $_[0] eq 'serialized' || $_[0] eq 'JSON' );
     }
 );
-has json => ( is => 'ro', default => sub { JSON::XS->new } );
+has json => ( is => 'ro', default => sub { JSON::Any->new } );
 
 has default_response_transform => (
     is      => 'rw',
@@ -61,6 +64,7 @@ has default_response_transform => (
 );
 
 has ua_options => ( is => 'lazy', default => sub { +{} });
+has ua_class => ( is => 'lazy', default => sub { 'HTTP::Tiny' });
 
 with 'WWW::JSON::Role::Authentication';
 my %METHOD_DISPATCH = (
@@ -77,6 +81,12 @@ sub put    { shift->req( 'PUT',    @_ ) }
 sub delete { shift->req( 'DELETE', @_ ) }
 sub head   { shift->req( 'HEAD',   @_ ) }
 
+sub _build_ua {
+    my $self = shift;
+    my $class = $self->ua_class;
+    require_module($class) or die "$class not found";
+    $class->new(%{$self->ua_options});
+}
 
 sub req {
     my ( $self, $method, $path, $params) = @_;
@@ -128,10 +138,24 @@ sub _create_request_obj {
     return $dispatch->( $uri->as_string, %payload );
 }
 
+sub _http_req {
+    my ( $self, $req ) = @_;
+    my $resp;
+    if ( $self->ua->$_isa('HTTP::Tiny') ) {
+        my @params = ( $req->method, $req->url, { content => $req->content } );
+        $resp = $self->ua->request(@params);
+        $resp = WWW::JSON::HTTPResponse->new(%$resp);
+    }
+    else {
+        $resp = $self->ua->request($req);
+    }
+    return $resp;
+}
+
 sub _make_request {
     my ( $self, $method, $uri, $p ) = @_;
     my $request_obj = $self->_create_request_obj( $method, $uri, $p );
-    my $resp = $self->ua->request($request_obj);
+    my $resp = $self->_http_req($request_obj);
 
     return WWW::JSON::Response->new(
         {

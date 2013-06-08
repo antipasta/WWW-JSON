@@ -1,63 +1,14 @@
-package WWW::JSON::Response;
+package WWW::JSON::HTTPResponse;
 use strict;
 use warnings;
 use Moo;
-use JSON::Any;
-use Try::Tiny;
 
-has http_response => (
-    is       => 'ro',
-    required => 1,
+has status_line     => ( is => 'ro', init_arg => 'reason' );
+has base            => ( is => 'ro', init_arg => 'url' );
+has is_success      => ( is => 'ro', init_arg => 'success' );
+has decoded_content => ( is => 'ro', init_arg => 'content' );
+has code            => ( is => 'ro' );
 
-    handles => {
-        status_line => 'status_line',
-        code        => 'code',
-        url         => 'base',
-        content     => 'decoded_content',
-    },
-);
-has json => ( is => 'lazy', default => sub { JSON::Any->new } );
-has response            => ( is => 'lazy', builder => '_build_response' );
-has error               => ( is => 'lazy', writer => '_set_error' );
-has _request_params     => ( is => 'ro' );
-has _parent             => ( is => 'ro' );
-has _response_transform => ( is => 'ro' );
-
-sub success { !shift->error }
-
-sub _build_error {
-    my $self = shift;
-    $self->_set_error('');
-    $self->response;
-    return $self->error;
-}
-
-sub _build_response {
-    my $self = shift;
-
-    $self->_set_error( $self->status_line )
-      unless ( $self->http_response->is_success );
-
-    my $decoded = try {
-        $self->json->decode( $self->http_response->decoded_content );
-    }
-    catch {
-        $self->_set_error("$_") unless ( $self->error );
-        return;
-    };
-
-    if ( !( $self->error ) && $self->_response_transform ) {
-        $decoded = $self->_response_transform->($decoded);
-    }
-    return $decoded;
-}
-
-sub res { shift->response }
-
-sub retry {
-    my $self = shift;
-    return $self->_parent->_make_request( @{ $self->_request_params } );
-}
 
 1;
 
