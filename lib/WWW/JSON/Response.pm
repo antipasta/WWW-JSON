@@ -19,7 +19,7 @@ has http_response => (
 has json => ( is => 'lazy', default => sub { JSON::XS->new } );
 has response            => ( is => 'lazy', builder => '_build_response' );
 has error               => ( is => 'lazy', writer => '_set_error' );
-has _request_params     => ( is => 'ro' );
+has _request_obj     => ( is => 'ro' );
 has _parent             => ( is => 'ro' );
 has _response_transform => ( is => 'ro' );
 
@@ -56,7 +56,7 @@ sub res { shift->response }
 
 sub retry {
     my $self = shift;
-    return $self->_parent->_make_request( @{ $self->_request_params } );
+    return $self->_parent->http_request($self->_request_obj);
 }
 
 1;
