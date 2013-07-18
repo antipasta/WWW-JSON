@@ -1,6 +1,8 @@
 Revision history for Perl extension WWW-JSON
 
 {{$NEXT}}
+
+0.05 2013-07-18T19:07:02Z
     - Some code restructuring
     - http_request method which allows you to past a fully formed HTTP::Request object. Auth is applied and nothing else
     - Fixed a bug around when relative URI objects are requested
