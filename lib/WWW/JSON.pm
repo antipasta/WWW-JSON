@@ -51,6 +51,7 @@ has post_body_format => (
     }
 );
 has json => ( is => 'ro', default => sub { JSON::XS->new } );
+has content_type => ( is => 'rw', clearer => 1 );
 
 has default_response_transform => (
     is      => 'rw',
@@ -107,11 +108,11 @@ sub _create_post_body {
     my ( $self, $p ) = @_;
     if ( $self->post_body_format eq 'JSON' ) {
         return (
-            'Content-Type' => 'application/json',
+            'Content-Type' => $self->content_type || 'application/json',
             Content        => $self->json->encode($p)
         );
     }
-    return ( Content => $p );
+    return ( Content => $p, ($self->content_type) ? ('Content-Type' => $self->content_type) : () );
 }
 
 sub _create_request_obj {
