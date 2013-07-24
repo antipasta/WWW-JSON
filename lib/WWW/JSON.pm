@@ -50,7 +50,7 @@ has post_body_format => (
           unless ( $_[0] eq 'serialized' || $_[0] eq 'JSON' );
     }
 );
-has json => ( is => 'ro', default => sub { JSON::XS->new } );
+has json => ( is => 'ro', default => sub { JSON::XS->new->allow_nonref } );
 has content_type => ( is => 'rw', clearer => 1 );
 
 has default_response_transform => (
