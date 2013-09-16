@@ -3,6 +3,7 @@ Revision history for Perl extension WWW-JSON
 {{$NEXT}}
     - HTTP DELETE should pass params in query string
     - Dont try to JSON decode if you get nothing back
+    - allow_nonref when decoding JSON
 
 0.05 2013-07-18T19:07:02Z
     - Some code restructuring
