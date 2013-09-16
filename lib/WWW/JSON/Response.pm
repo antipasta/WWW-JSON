@@ -38,6 +38,8 @@ sub _build_response {
     $self->_set_error( $self->status_line )
       unless ( $self->http_response->is_success );
 
+    return unless ($self->http_response->decoded_content);
+
     my $decoded = try {
         $self->json->decode( $self->http_response->decoded_content );
     }
