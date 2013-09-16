@@ -87,7 +87,7 @@ sub req {
         $path = URI->new($path);
     }
     my $p =
-      ( $method eq 'GET' )
+      ( $method eq 'GET' || $method eq 'DELETE' )
       ? $params
       : { %{ $self->body_params }, %{$params} };
     my $abs_uri =
@@ -123,7 +123,7 @@ sub _create_request_obj {
     my %payload;
 
     if ($p) {
-        if ( $method eq 'GET' ) {
+        if ( $method eq 'GET' || $method eq 'DELETE') {
             $uri->query_form( $uri->query_form, %$p );
         }
         else { %payload = $self->_create_post_body($p) }
