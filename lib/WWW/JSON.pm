@@ -86,7 +86,7 @@ sub req {
       ( $method eq 'GET' || $method eq 'DELETE' )
       ? $params
       : { %{ $self->body_params }, %{$params} };
-    $self->_template(\$path,$p);
+    ( $path, $p ) = $self->_do_templating( $path, $p ) if ( $path =~ /\[\%/ );
     unless ( $path->$_isa('URI') && $path->scheme ) {
         $path =~ s|^/|./|;
         $path = URI->new($path);
@@ -99,15 +99,14 @@ sub req {
 
     return $self->http_request( $request_obj, $p);
 }
-sub _template {
+sub _do_templating {
     my ( $self, $path, $params ) = @_;
-    return unless ( $$path =~ /\[\%/ );
+    my %modified_params = %$params;
     for my $key ( keys(%$params) ) {
-        my $val = $params->{$key};
-        if ( $$path =~ s/\[\%\s*$key\s*\%\]/$val/g ) {
-            delete $params->{$key};
-        }
+        delete $modified_params{$key}
+          if ( $path =~ s/\[\%\s*$key\s*\%\]/$params->{$key}/g );
     }
+    return ( $path, \%modified_params );
 }
 
 sub body_param {
