@@ -82,14 +82,15 @@ sub head   { shift->req( 'HEAD',   @_ ) }
 sub req {
     my ( $self, $method, $path, $params ) = @_;
     $params = {} unless defined($params);
-    unless ( $path->$_isa('URI') && $path->scheme ) {
-        $path =~ s|^/|./|;
-        $path = URI->new($path);
-    }
     my $p =
       ( $method eq 'GET' || $method eq 'DELETE' )
       ? $params
       : { %{ $self->body_params }, %{$params} };
+    $self->_template($path,$p);
+    unless ( $path->$_isa('URI') && $path->scheme ) {
+        $path =~ s|^/|./|;
+        $path = URI->new($path);
+    }
     my $abs_uri =
       ( $path->scheme ) ? $path : URI->new_abs( $path, $self->base_url );
     $abs_uri->query_form( $path->query_form, $self->base_url->query_form );
@@ -97,6 +98,16 @@ sub req {
     my $request_obj = $self->_create_request_obj( $method, $abs_uri, $p );
 
     return $self->http_request( $request_obj, $p);
+}
+sub _template {
+    my ( $self, $path, $params ) = @_;
+    return unless ( $path =~ /\[\%/ );
+    for my $key ( keys(%$params) ) {
+        my $val = $params->{$key};
+        if ( $path =~ s/\[\%\s*$key\s*\%\]/$val/g ) {
+            delete $params->{$key};
+        }
+    }
 }
 
 sub body_param {
