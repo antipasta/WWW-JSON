@@ -86,7 +86,7 @@ sub req {
       ( $method eq 'GET' || $method eq 'DELETE' )
       ? $params
       : { %{ $self->body_params }, %{$params} };
-    $self->_template($path,$p);
+    $self->_template(\$path,$p);
     unless ( $path->$_isa('URI') && $path->scheme ) {
         $path =~ s|^/|./|;
         $path = URI->new($path);
@@ -101,10 +101,10 @@ sub req {
 }
 sub _template {
     my ( $self, $path, $params ) = @_;
-    return unless ( $path =~ /\[\%/ );
+    return unless ( $$path =~ /\[\%/ );
     for my $key ( keys(%$params) ) {
         my $val = $params->{$key};
-        if ( $path =~ s/\[\%\s*$key\s*\%\]/$val/g ) {
+        if ( $$path =~ s/\[\%\s*$key\s*\%\]/$val/g ) {
             delete $params->{$key};
         }
     }
