@@ -49,24 +49,27 @@ $fake_ua->map(
 );
 
 ok my $wj = WWW::JSON->new( ua => $fake_ua, base_url => 'http://localhost' );
-ok my $get = $wj->get('/get/request/[% template_var %]/test', { ':template_var' => 123});
+ok my $get = $wj->get( '/get/request/[% template_var %]/test',
+    { -template_var => 123 } );
 ok $get->success, 'Got Success';
 is $get->code => 200, 'Got 200 OK';
 ok $get->res->{success} eq 'this is working';
 
-ok my $get_query_param =
-  $wj->get( '/get/[% template_var %]/request_query_param', { some_query_param => 'yes', ':template_var' => 123 } );
+ok my $get_query_param = $wj->get(
+    '/get/[% template_var %]/request_query_param',
+    { some_query_param => 'yes', -template_var => 123 }
+);
 ok $get_query_param->success, 'Got Success';
 is $get_query_param->code => 200, 'Got 200';
-ok $get_query_param->res->{success} eq 'this is also working', 'Got get response';
+ok $get_query_param->res->{success} eq 'this is also working',
+  'Got get response';
 
-ok my $post =
-$wj->post(
+ok my $post = $wj->post(
     '/post/[% template_var1 %]/a/[% template_var2 %]',
     {
         some_query_param => 'yes',
-        ':template_var1' => 123,
-        ':template_var2' => 456
+        -template_var1   => 123,
+        -template_var2   => 456
     }
 );
 ok $post->success, 'Got Success';
