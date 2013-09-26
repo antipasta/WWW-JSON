@@ -37,7 +37,7 @@ $fake_ua->map(
 );
 
 $fake_ua->map(
-    'http://localhost/post/123/a',
+    'http://localhost/post/123/a/456',
     sub {
         my $req = shift;
         my $uri = $req->uri;
@@ -61,7 +61,14 @@ is $get_query_param->code => 200, 'Got 200';
 ok $get_query_param->res->{success} eq 'this is also working', 'Got get response';
 
 ok my $post =
-  $wj->post( '/post/[% template_var %]/a', { some_query_param => 'yes', ':template_var' => 123 } );
+$wj->post(
+    '/post/[% template_var1 %]/a/[% template_var2 %]',
+    {
+        some_query_param => 'yes',
+        ':template_var1' => 123,
+        ':template_var2' => 456
+    }
+);
 ok $post->success, 'Got Success';
 is $post->code => 200, 'Got 200';
 ok $post->res->{success} eq 'this is also working', 'Got get response';
