@@ -221,6 +221,7 @@ Thus, WWW::JSON was born. Perl + Web + JSON - tears
     -Set a url that all requests will be relative to
     -Set query params included on all requests
     -Set body params included on all requests that contain a POST body
+    -URL paths support primitive templating
     -Transform the response of all API requests. Useful if an API returns data in a silly structure.
 
 -Work with APIs that require different parameter serialization
@@ -240,6 +241,12 @@ Thus, WWW::JSON was born. Perl + Web + JSON - tears
     -Don't have to worry about going from JSON => perl and back
     -Handles HTTP and JSON decode errors gracefully
 
+-Templating
+    Can put templates in url paths
+
+    Use template toolkit style brackets in url. Populate a template variable in the second parameter's
+    hashref by prefixing it with a dash(-). Example:
+        $wj->get('/users/[% user_id %]/status, { page => 3, -user_id => 456 });
 
 
 =head1 PARAMETERS
