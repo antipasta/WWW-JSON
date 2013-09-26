@@ -29,7 +29,8 @@ $fake_ua->map(
     }
 );
 
-ok my $fixed = $get_404->retry;
+ok my $fixed = $wj->http_request($get_404->request_object);
+
 ok $fixed->success,   'Got success';
 is $fixed->code    => 200, 'Got code 200';
 done_testing;

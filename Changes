@@ -1,6 +1,8 @@
 Revision history for Perl extension WWW-JSON
 
 {{$NEXT}}
+    - Adding EXPERIMENTAL templating in URL paths. Example usage: $wj->get('/users/[% user_id %]/status', { queryparam1 => 'foo', -user_id => 123 });
+    - Removed experimental retry functionality, instead use $wj->http_request($response->request_object) to retry
 
 0.06 2013-09-16T22:07:19Z
     - HTTP DELETE should pass params in query string

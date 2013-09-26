@@ -98,12 +98,13 @@ sub req {
 
     my $request_obj = $self->_create_request_obj( $method, $abs_uri, $p );
 
-    return $self->http_request( $request_obj, $p);
+    return $self->http_request( $request_obj, $p );
 }
+
 sub _do_templating {
     my ( $self, $path, $params ) = @_;
     my %modified_params = %$params;
-    for my $key ( grep { $_ =~ /^-/ }keys(%$params) ) {
+    for my $key ( grep { $_ =~ /^-/ } keys(%$params) ) {
         my $search_key = $key =~ s/^-//rg;
         delete $modified_params{$key}
           if ( $path =~ s/\[\%\s*$search_key\s*\%\]/$params->{$key}/g );
@@ -121,10 +122,13 @@ sub _create_post_body {
     if ( $self->post_body_format eq 'JSON' ) {
         return (
             'Content-Type' => $self->content_type || 'application/json',
-            Content        => $self->json->encode($p)
+            Content => $self->json->encode($p)
         );
     }
-    return ( Content => $p, ($self->content_type) ? ('Content-Type' => $self->content_type) : () );
+    return (
+        Content => $p,
+        ( $self->content_type ) ? ( 'Content-Type' => $self->content_type ) : ()
+    );
 }
 
 sub _create_request_obj {
@@ -135,7 +139,7 @@ sub _create_request_obj {
     my %payload;
 
     if ($p) {
-        if ( $method eq 'GET' || $method eq 'DELETE') {
+        if ( $method eq 'GET' || $method eq 'DELETE' ) {
             $uri->query_form( $uri->query_form, %$p );
         }
         else { %payload = $self->_create_post_body($p) }
@@ -144,7 +148,7 @@ sub _create_request_obj {
 }
 
 sub http_request {
-    my ( $self, $request_obj) = @_;
+    my ( $self, $request_obj ) = @_;
     my $resp = $self->ua->request($request_obj);
 
     return WWW::JSON::Response->new(
@@ -152,8 +156,7 @@ sub http_request {
             http_response       => $resp,
             _response_transform => $self->default_response_transform,
             json                => $self->json,
-            _request_obj        => $request_obj,
-            _parent             => $self,
+            request_object      => $request_obj,
         }
     );
 }
