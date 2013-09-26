@@ -86,7 +86,8 @@ sub req {
       ( $method eq 'GET' || $method eq 'DELETE' )
       ? $params
       : { %{ $self->body_params }, %{$params} };
-    ( $path, $p ) = $self->_do_templating( $path, $p ) if ( $path =~ /\[\%/ );
+    ( $path, $p ) = $self->_do_templating( $path, $p )
+      if ( $path =~ /\[\%.*\%\]/ );
     unless ( $path->$_isa('URI') && $path->scheme ) {
         $path =~ s|^/|./|;
         $path = URI->new($path);
@@ -102,9 +103,10 @@ sub req {
 sub _do_templating {
     my ( $self, $path, $params ) = @_;
     my %modified_params = %$params;
-    for my $key ( keys(%$params) ) {
+    for my $key ( grep { $_ =~ /^:/ }keys(%$params) ) {
+        my $search_key = $key =~ s/^://rg;
         delete $modified_params{$key}
-          if ( $path =~ s/\[\%\s*$key\s*\%\]/$params->{$key}/g );
+          if ( $path =~ s/\[\%\s*$search_key\s*\%\]/$params->{$key}/g );
     }
     return ( $path, \%modified_params );
 }
