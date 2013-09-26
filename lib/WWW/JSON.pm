@@ -105,7 +105,7 @@ sub _do_templating {
     my ( $self, $path, $params ) = @_;
     my %modified_params = %$params;
     for my $key ( grep { $_ =~ /^-/ } keys(%$params) ) {
-        my $search_key = $key =~ s/^-//rg;
+        (my $search_key = $key) =~ s/^-//;
         delete $modified_params{$key}
           if ( $path =~ s/\[\%\s*$search_key\s*\%\]/$params->{$key}/g );
     }
