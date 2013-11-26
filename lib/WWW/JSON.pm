@@ -82,8 +82,9 @@ sub delete { shift->req( 'DELETE', @_ ) }
 sub head   { shift->req( 'HEAD',   @_ ) }
 
 sub req {
-    my ( $self, $method, $path, $params ) = @_;
+    my ( $self, $method, $path, $params, $opts ) = @_;
     $params = {} unless defined($params);
+    $opts = {} unless defined($opts);
     my $p =
       ( $method eq 'GET' || $method eq 'DELETE' )
       ? $params
@@ -96,7 +97,11 @@ sub req {
     }
     my $abs_uri =
       ( $path->scheme ) ? $path : URI->new_abs( $path, $self->base_url );
-    $abs_uri->query_form( $path->query_form, $self->base_url->query_form );
+    $abs_uri->query_form(
+        $path->query_form,
+        $self->base_url->query_form,
+        ( $opts->{query_params} ) ? %{ $opts->{query_params} } : ()
+    );
 
     my $request_obj = $self->_create_request_obj( $method, $abs_uri, $p );
 
