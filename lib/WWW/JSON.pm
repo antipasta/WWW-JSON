@@ -41,6 +41,7 @@ has base_url => (
     }
 );
 has body_params => ( is => 'rw', default => sub { +{} } );
+has query_params => ( is => 'rw', default => sub { +{} } );
 has post_body_format => (
     is      => 'rw',
     default => sub { 'serialized' },
@@ -85,27 +86,39 @@ sub req {
     my ( $self, $method, $path, $params, $opts ) = @_;
     $params = {} unless defined($params);
     $opts = {} unless defined($opts);
-    my $p =
-      ( $method eq 'GET' || $method eq 'DELETE' )
-      ? $params
-      : { %{ $self->body_params }, %{$params} };
-    ( $path, $p ) = $self->_do_templating( $path, $p )
+    my $body_params;
+    $body_params = { %{ $self->body_params }, %{$params} }
+      if $method eq 'POST';
+    ( $path, $params ) = $self->_do_templating( $path, $params )
       if ( $path =~ /\[\%.*\%\]/ );
     unless ( $path->$_isa('URI') && $path->scheme ) {
         $path =~ s|^/|./|;
         $path = URI->new($path);
     }
+
     my $abs_uri =
       ( $path->scheme ) ? $path : URI->new_abs( $path, $self->base_url );
+
     $abs_uri->query_form(
-        $path->query_form,
-        $self->base_url->query_form,
-        ( $opts->{query_params} ) ? %{ $opts->{query_params} } : ()
+        $self->_determine_query_params( $method, $path, $params,
+            $opts->{query_params} )
     );
 
-    my $request_obj = $self->_create_request_obj( $method, $abs_uri, $p );
+    my $request_obj = $self->_create_request_obj( $method, $abs_uri, $body_params );
 
-    return $self->http_request( $request_obj, $p );
+    return $self->http_request( $request_obj);
+}
+
+sub _determine_query_params {
+    my ( $self, $method, $path, $params, $opt_params ) = @_;
+    my %query_params = (
+        $self->base_url->query_form,
+        ($self->query_params) ? %{$self->query_params} : (),
+        $path->query_form,
+        ( $params && $method eq 'GET' ) ? %$params : (),
+        ($opt_params) ? (%$opt_params) : ()
+    );
+    return %query_params;
 }
 
 sub _do_templating {
@@ -145,11 +158,8 @@ sub _create_request_obj {
 
     my %payload;
 
-    if ($p) {
-        if ( $method eq 'GET' || $method eq 'DELETE' ) {
-            $uri->query_form( $uri->query_form, %$p );
-        }
-        else { %payload = $self->_create_post_body($p) }
+    if ( $p && $method eq 'POST' ) {
+        %payload = $self->_create_post_body($p);
     }
     return $dispatch->( $uri->as_string, %payload );
 }
