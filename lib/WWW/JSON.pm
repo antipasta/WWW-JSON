@@ -144,7 +144,7 @@ sub body_param {
 }
 
 sub _create_post_body {
-    my ( $self, $p ) = @_;
+    my ( $self, $method, $p ) = @_;
     if ( $self->post_body_format eq 'JSON' ) {
         return (
             'Content-Type' => $self->content_type || 'application/json',
@@ -152,7 +152,9 @@ sub _create_post_body {
         );
     }
     return (
-        Content => $self->_encode_content_body($p),
+        # If this is a POST, let HTTP::Request::Common take care of it
+        # for the sake of form uploads.
+        Content => ($method eq 'POST') ? $p : $self->_encode_content_body($p),
         'Content-Type' => $self->content_type || 'application/x-www-form-urlencoded'
     );
 }
@@ -172,7 +174,7 @@ sub _create_request_obj {
     my %payload;
 
     if ( $p && $self->_http_method_uses_post_body($method)) {
-        %payload = $self->_create_post_body($p);
+        %payload = $self->_create_post_body($method,$p);
     }
     return $dispatch->( $uri->as_string, %payload );
 }
