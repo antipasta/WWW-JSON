@@ -80,8 +80,6 @@ Thus, WWW::JSON was born. Perl + Web + JSON - tears
     hashref by prefixing it with a dash(-). Example:
         $wj->get('/users/[% user_id %]/status, { page => 3, -user_id => 456 });
 
-
-
 # PARAMETERS
 
 ## base\_url
@@ -105,8 +103,6 @@ How to serialize the post body.
 'serialized' - Normal post body serialization (this is the default)
 
 'JSON' - JSONify the post body. Used by API's like github and google plus
-
-
 
 ## default\_response\_transform
 
@@ -163,8 +159,6 @@ $wj->put($path,$params)
 
 Performs a PUT request. $params is a hashref of parameters to be passed to the post body
 
-
-
 ## delete
 
 $wj->delete($path,$params)
@@ -180,8 +174,6 @@ Performs an HTTP request of type $method. $params is a hashref of parameters to 
 ## body\_param
 
 Add/Update a single body param
-
-
 
 # LICENSE
 
@@ -201,7 +193,3 @@ Joe Papperello <antipasta@cpan.org>
 \-App::Adenosine - Using this on the command line definitely served as some inspiration for WWW::JSON.
 
 \-Net::HTTP::Spore - I found this while researching other modules in this space. It's still a bit abstracted from the actual web request for my taste, but it's obvious the author created it out of some of the same above frustrations and it looks useful.
-
-
-
-
