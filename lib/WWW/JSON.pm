@@ -82,13 +82,19 @@ sub put    { shift->req( 'PUT',    @_ ) }
 sub delete { shift->req( 'DELETE', @_ ) }
 sub head   { shift->req( 'HEAD',   @_ ) }
 
+
+sub _http_method_uses_post_body {
+    my ($self,$method) = @_;
+    return ($method eq 'POST' || $method eq 'PUT');
+}
+
 sub req {
     my ( $self, $method, $path, $params, $opts ) = @_;
     $params = {} unless defined($params);
     $opts = {} unless defined($opts);
     my $body_params;
     $body_params = { %{ $self->body_params }, %{$params} }
-      if $method eq 'POST';
+      if $self->_http_method_uses_post_body($method);
     ( $path, $params ) = $self->_do_templating( $path, $params )
       if ( $path =~ /\[\%.*\%\]/ );
     unless ( $path->$_isa('URI') && $path->scheme ) {
@@ -115,7 +121,7 @@ sub _determine_query_params {
         $self->base_url->query_form,
         ($self->query_params) ? %{$self->query_params} : (),
         $path->query_form,
-        ( $params && $method eq 'GET' ) ? %$params : (),
+        ( $params && ! $self->_http_method_uses_post_body($method) ) ? %$params : (),
         ($opt_params) ? (%$opt_params) : ()
     );
     return %query_params;
@@ -146,9 +152,16 @@ sub _create_post_body {
         );
     }
     return (
-        Content => $p,
-        ( $self->content_type ) ? ( 'Content-Type' => $self->content_type ) : ()
+        Content => $self->_encode_content_body($p),
+        'Content-Type' => $self->content_type || 'application/x-www-form-urlencoded'
     );
+}
+
+sub _encode_content_body {
+    my ($self,$p) = @_;
+    my $u = URI->new;
+    $u->query_form(%$p);
+    return $u->query;
 }
 
 sub _create_request_obj {
@@ -158,7 +171,7 @@ sub _create_request_obj {
 
     my %payload;
 
-    if ( $p && $method eq 'POST' ) {
+    if ( $p && $self->_http_method_uses_post_body($method)) {
         %payload = $self->_create_post_body($p);
     }
     return $dispatch->( $uri->as_string, %payload );

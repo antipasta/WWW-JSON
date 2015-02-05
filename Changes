@@ -1,6 +1,8 @@
 Revision history for Perl extension WWW-JSON
 
 {{$NEXT}}
+    - PUTs need to work like POSTs, not GETs
+    - Added Header authentication method
 
 0.08 2013-10-15T18:19:28Z
     - Turn on utf8 flag for json encode and decode
