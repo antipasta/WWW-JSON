@@ -1,6 +1,9 @@
 Revision history for Perl extension WWW-JSON
 
 {{$NEXT}}
+    - PUTs need to work like POSTs, not GETs
+    - Added Header authentication method
+    - get,post etc can now take an additional options hashref as an optional third parameter. currently used to define additional query params
 
 0.08 2013-10-15T18:19:28Z
     - Turn on utf8 flag for json encode and decode
