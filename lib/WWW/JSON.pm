@@ -92,11 +92,11 @@ sub req {
     my ( $self, $method, $path, $params, $opts ) = @_;
     $params = {} unless defined($params);
     $opts = {} unless defined($opts);
+    ( $path, $params ) = $self->_do_templating( $path, $params )
+      if ( $path =~ /\[\%.*\%\]/ );
     my $body_params;
     $body_params = { %{ $self->body_params }, %{$params} }
       if $self->_http_method_uses_post_body($method);
-    ( $path, $params ) = $self->_do_templating( $path, $params )
-      if ( $path =~ /\[\%.*\%\]/ );
     unless ( $path->$_isa('URI') && $path->scheme ) {
         $path =~ s|^/|./|;
         $path = URI->new($path);
