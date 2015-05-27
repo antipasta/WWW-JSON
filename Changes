@@ -1,6 +1,7 @@
 Revision history for Perl extension WWW-JSON
 
 {{$NEXT}}
+    - Fixed bug where templating was being done after setting body params
 
 1.01 2015-02-05T18:55:44Z
     - Use HTTP::Request::Common for POSTs, for file uploads
