@@ -35,7 +35,6 @@ my $post = $wj->post(
         size => 1
     }
 );
-warn "DISTRIBUTION: " . $get->res->{distribution} unless $get->success;
 warn "Status is " . $post->status_line;
 warn "Request URL is " . $post->url;
 warn "Content is " . Dumper( $post->res );
